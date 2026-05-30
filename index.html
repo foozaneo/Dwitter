@@ -208,7 +208,7 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
 #landing-loading{text-align:center;color:var(--text-sub);font-size:0.82rem;padding:8px 0;}
 
 /* ========== CONFIRM DIALOG ========== */
-.confirm-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;justify-content:center;align-items:center;z-index:1000;padding:20px;backdrop-filter:blur(3px);}
+.confirm-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;justify-content:center;align-items:center;z-index:2000;padding:20px;backdrop-filter:blur(3px);}
 .confirm-overlay.open{display:flex;}
 .confirm-box{background:var(--bg-card);border-radius:16px;padding:28px;width:100%;max-width:380px;text-align:center;}
 .confirm-box h3{font-size:1rem;font-weight:700;margin-bottom:8px;}
@@ -310,18 +310,6 @@ body.dark-mode .goal-card,body.dark-mode .envelope-item,body.dark-mode .panel-fo
   </div>
 </div>
 
-<!-- ===== CONFIRM DELETE DIALOG ===== -->
-<div class="confirm-overlay" id="confirm-overlay">
-  <div class="confirm-box">
-    <h3>🗑️ Hapus Transaksi?</h3>
-    <p id="confirm-desc">Data ini akan dihapus permanen dan tidak bisa dikembalikan.</p>
-    <div class="confirm-actions">
-      <button class="btn" onclick="closeConfirm()">Batal</button>
-      <button class="btn btn-danger" id="confirm-ok-btn">Ya, Hapus</button>
-    </div>
-  </div>
-</div>
-
 <!-- ===== PANEL: TABUNGAN ===== -->
 <div class="panel-overlay" id="panel-tabungan" onclick="closePanelOnBg(event,'panel-tabungan')">
   <div class="panel">
@@ -372,6 +360,18 @@ body.dark-mode .goal-card,body.dark-mode .envelope-item,body.dark-mode .panel-fo
       <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="showEnvelopeForm()">
         + Tambah Pos Kebutuhan
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CONFIRM DELETE DIALOG ===== -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>🗑️ Hapus data ini?</h3>
+    <p id="confirm-desc">Data ini akan dihapus permanen dan tidak bisa dikembalikan.</p>
+    <div class="confirm-actions">
+      <button class="btn" id="confirm-cancel-btn">Batal</button>
+      <button class="btn btn-danger" id="confirm-ok-btn">Ya, Hapus</button>
     </div>
   </div>
 </div>
@@ -766,7 +766,7 @@ let currentUser = null;
 let allIncomeData   = [];
 let allExpensesData = [];
 let ALLOC_PCT = { tabungan: 30, keinginan: 20, kebutuhan: 50 };
-let pendingDeleteFn = null; // Untuk confirm dialog
+let pendingDeleteFn = null; // deprecated, kept for safety
 
 // =============================================
 // AUTH — GOOGLE LOGIN / LOGOUT
@@ -882,6 +882,7 @@ async function initApp() {
   await loadAllocationSettings();
   loadDashboard();
   populateEnvelopeDropdown();
+  startKeepAlive();
 }
 
 // =============================================
@@ -1075,9 +1076,9 @@ async function submitPemasukan() {
   const btn = document.getElementById('btn-submit-pemasukan');
   btn.disabled=true; btn.innerHTML='<span class="loading-spin"></span> Menyimpan...';
 
-  const { error } = await sb.from('income').insert({
+  const { error } = await sbQuery(() => sb.from('income').insert({
     user_id: currentUser.id, tanggal, bulan, tahun, transaksi, alokasi, nilai: +nilai, uraian
-  });
+  }));
 
   btn.disabled=false;
   btn.innerHTML='<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;"><polyline points="20 6 9 17 4 12" stroke-width="2"/></svg> Simpan Pemasukan';
@@ -1111,10 +1112,10 @@ async function submitPengeluaran() {
   const btn = document.getElementById('btn-submit-pengeluaran');
   btn.disabled=true; btn.innerHTML='<span class="loading-spin"></span> Menyimpan...';
 
-  const { error } = await sb.from('expenses').insert({
+  const { error } = await sbQuery(() => sb.from('expenses').insert({
     user_id: currentUser.id, tanggal, bulan, tahun, transaksi, kategori, nilai: +nilai, uraian,
     envelope: kategori === 'Kebutuhan' && envelope ? envelope : null
-  });
+  }));
 
   btn.disabled=false;
   btn.innerHTML='<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;"><polyline points="20 6 9 17 4 12" stroke-width="2"/></svg> Simpan Pengeluaran';
@@ -1231,21 +1232,36 @@ function filterExpenses() {
 // CONFIRM & DELETE
 // =============================================
 function confirmDelete(table, id, label) {
-  document.getElementById('confirm-desc').textContent = `Hapus "${label || id}"? Data ini tidak bisa dikembalikan.`;
-  document.getElementById('confirm-overlay').classList.add('open');
-  pendingDeleteFn = () => doDelete(table, id);
-  document.getElementById('confirm-ok-btn').onclick = () => {
+  const overlay = document.getElementById('confirm-overlay');
+  const okBtn   = document.getElementById('confirm-ok-btn');
+  const cancelBtn = document.getElementById('confirm-cancel-btn');
+
+  document.getElementById('confirm-desc').textContent =
+    `Hapus "${label || id}"? Data ini tidak bisa dikembalikan.`;
+
+  // Clone tombol untuk hapus semua listener lama
+  const newOk = okBtn.cloneNode(true);
+  const newCancel = cancelBtn.cloneNode(true);
+  okBtn.parentNode.replaceChild(newOk, okBtn);
+  cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+
+  newOk.addEventListener('click', () => {
     closeConfirm();
-    pendingDeleteFn && pendingDeleteFn();
-  };
+    doDelete(table, id);
+  });
+  newCancel.addEventListener('click', closeConfirm);
+
+  overlay.style.display = 'flex';
 }
+
 function closeConfirm() {
-  document.getElementById('confirm-overlay').classList.remove('open');
-  pendingDeleteFn = null;
+  document.getElementById('confirm-overlay').style.display = 'none';
 }
 
 async function doDelete(table, id) {
-  const { error } = await sb.from(table).delete().eq('id', id).eq('user_id', currentUser.id);
+  const { error } = await sbQuery(() =>
+    sb.from(table).delete().eq('id', id).eq('user_id', currentUser.id)
+  );
   if (!error) {
     showToast('Data berhasil dihapus ✓', 'success');
     refreshAll();
@@ -1700,6 +1716,34 @@ async function populateEnvelopeDropdown() {
 function toggleEnvelopeField() {
   const kat = document.getElementById('out-kategori').value;
   document.getElementById('envelope-field').style.display = kat === 'Kebutuhan' ? '' : 'none';
+}
+
+// =============================================
+// KEEP-ALIVE — cegah Supabase Free Tier tidur
+// =============================================
+function startKeepAlive() {
+  // Ping ringan setiap 4 menit selama user aktif
+  setInterval(async () => {
+    try { await sb.from('user_settings').select('id').eq('user_id', currentUser.id).limit(1); }
+    catch (_) {}
+  }, 4 * 60 * 1000);
+}
+
+// Wrapper query dengan auto-retry 1x jika timeout/gagal
+async function sbQuery(queryFn, retries = 1) {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const result = await Promise.race([
+        queryFn(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
+      ]);
+      if (result.error && i < retries) continue;
+      return result;
+    } catch (e) {
+      if (i === retries) return { data: null, error: e };
+      await new Promise(r => setTimeout(r, 1500)); // tunggu 1.5s sebelum retry
+    }
+  }
 }
 
 // =============================================
