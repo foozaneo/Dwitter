@@ -987,7 +987,7 @@ async function callAPIPost(data) {
     const res = await fetch(GSHEET_URL, {
       method: 'POST',
       body: JSON.stringify(data),
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'text/plain' }
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return await res.json();
