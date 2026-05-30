@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-<title>Fauzan Finance — Laporan Keuangan Pribadi 2026</title>
+<title>Dwitter — Personal Finance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -21,12 +21,30 @@
   --sans:'Plus Jakarta Sans',sans-serif; --mono:'JetBrains Mono',monospace;
   --ease:cubic-bezier(.4,0,.2,1);
   font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 *{box-sizing:border-box;margin:0;padding:0;outline:none;}
-body{background:var(--bg-body);color:var(--text-main);font-family:var(--sans);font-size:1rem;display:flex;min-height:100vh;}
+body{background:var(--bg-body);color:var(--text-main);font-family:var(--sans);font-size:1rem;display:flex;min-height:100vh;transition: all 0.3s ease;}
+
+/* ========== THEMES ========== */
+body.theme-emerald {
+  --primary: #16a34a; --primary-dark: #15803d; --primary-light: #dcfce7; --border-focus: #16a34a; --bg-body: #f0fdf4;
+}
+body.theme-indigo {
+  --primary: #4f46e5; --primary-dark: #4338ca; --primary-light: #e0e7ff; --border-focus: #4f46e5; --bg-body: #f5f3ff;
+}
+body.theme-rose {
+  --primary: #e11d48; --primary-dark: #be123c; --primary-light: #ffe4e6; --border-focus: #e11d48; --bg-body: #fff1f2;
+}
+body.theme-violet {
+  --primary: #7c3aed; --primary-dark: #6d28d9; --primary-light: #f3e8ff; --border-focus: #7c3aed; --bg-body: #faf5ff;
+}
+body.theme-amber {
+  --primary: #d97706; --primary-dark: #b45309; --primary-light: #fef3c7; --border-focus: #d97706; --bg-body: #fffbeb;
+}
 
 /* ========== SIDEBAR ========== */
-.sidebar{width:260px;background:var(--bg-sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100;overflow-y:auto;transition:transform .3s ease;}
+.sidebar{width:260px;background:var(--bg-sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100;overflow-y:auto;transition:width 0.3s ease, transform 0.3s ease;}
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%);width:280px;box-shadow:var(--shadow-lg);}
   .sidebar.open{transform:translateX(0);}
@@ -39,27 +57,56 @@ body{background:var(--bg-body);color:var(--text-main);font-family:var(--sans);fo
 .hamburger-btn{display:none;}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;}
 .sidebar-overlay.active{display:block;}
-.brand{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;}
-.brand-icon{width:52px;height:52px;background:var(--primary);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:4px;box-shadow:0 8px 20px rgba(22,163,74,.3);}
+.brand{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;overflow:hidden;}
+.brand-icon{width:52px;height:52px;background:var(--primary);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:4px;box-shadow:0 8px 20px rgba(22,163,74,.3);transition: all 0.3s ease;}
 .brand-icon svg{width:28px;height:28px;stroke:#fff;fill:none;}
-.brand h1{font-size:1.1rem;font-weight:800;color:var(--primary);margin:0;}
-.brand p{font-size:0.68rem;color:var(--text-sub);margin-top:2px;}
+.brand h1{font-size:1.1rem;font-weight:800;color:var(--primary);margin:0;white-space:nowrap;}
+.brand p{font-size:0.68rem;color:var(--text-sub);margin-top:2px;white-space:nowrap;}
 .nav-menu{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:4px;}
 .nav-section{font-size:0.63rem;font-weight:700;letter-spacing:1px;color:var(--text-muted);text-transform:uppercase;padding:12px 8px 6px;}
 .nav-item{display:flex;align-items:center;gap:12px;width:100%;padding:10px 16px;border:none;background:none;border-radius:8px;font-size:0.84rem;font-weight:500;text-align:left;cursor:pointer;transition:all .2s var(--ease);color:var(--text-sub);font-family:var(--sans);}
 .nav-item:hover{background:var(--primary-light);color:var(--primary);}
 .nav-item.active{background:var(--primary);color:#fff;box-shadow:var(--shadow-md);}
 .nav-item svg{width:17px;height:17px;stroke:currentColor;fill:none;flex-shrink:0;}
-#auth-container{padding:12px 16px 20px;border-top:1px solid var(--border);}
+#auth-container{padding:12px 16px 20px;border-top:1px solid var(--border);overflow:hidden;}
 .user-info{font-size:0.75rem;color:var(--text-sub);display:flex;align-items:center;gap:8px;padding:10px 4px;}
-.user-avatar{width:32px;height:32px;background:var(--primary-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;color:var(--primary);flex-shrink:0;}
+.user-avatar{width:32px;height:32px;background:var(--primary-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;color:var(--primary);flex-shrink:0;transition: all 0.3s ease;}
 
 /* ========== MAIN CONTENT ========== */
-.main-content{margin-left:260px;flex:1;padding:36px 48px;max-width:1400px;width:100%;}
+.main-content{margin-left:260px;flex:1;padding:36px 48px;max-width:1400px;width:100%;transition: margin-left 0.3s ease;}
 .page{display:none;}.page.active{display:block;}
 .header-section{margin-bottom:32px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
 .header-titles h2{font-size:1.55rem;font-weight:800;letter-spacing:-.8px;}
 .header-titles p{font-size:0.78rem;color:var(--text-sub);margin-top:4px;}
+
+/* ========== SIDEBAR COMPACT MODE STYLE ========== */
+body.sidebar-compact .sidebar {
+  width: 80px;
+}
+body.sidebar-compact .sidebar .brand h1,
+body.sidebar-compact .sidebar .brand p,
+body.sidebar-compact .sidebar .nav-item span,
+body.sidebar-compact .sidebar #auth-container .user-info div:last-child,
+body.sidebar-compact .sidebar #auth-container .btn,
+body.sidebar-compact .sidebar .nav-section {
+  display: none !important;
+}
+body.sidebar-compact .sidebar .brand {
+  padding: 20px 10px;
+}
+body.sidebar-compact .sidebar .nav-item {
+  justify-content: center;
+  padding: 12px;
+}
+body.sidebar-compact .main-content {
+  margin-left: 80px;
+}
+body.sidebar-compact .sidebar #auth-container .user-info {
+  justify-content: center;
+}
+body.sidebar-compact .sidebar #auth-container {
+  padding: 12px 10px 20px;
+}
 
 /* ========== STAT ========== */
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:32px;}
@@ -120,6 +167,30 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1;background
 .hint{font-size:0.7rem;color:var(--text-muted);margin-top:2px;}
 .form-footer{padding:16px 24px;background:#f8fffe;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;}
 .form-footer-left{padding:16px 24px;background:#f8fffe;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+
+/* ========== THEME CHOOSER IN SETTINGS ========== */
+.theme-chips-container {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 24px;
+}
+.theme-chip-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+.theme-chip-btn:hover {
+  transform: scale(1.15);
+}
+.theme-chip-btn.active {
+  border-color: var(--text-main);
+  transform: scale(1.1);
+}
 
 /* ========== MODAL ========== */
 .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;justify-content:center;align-items:center;z-index:1000;padding:20px;backdrop-filter:blur(3px);}
@@ -223,7 +294,7 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
 .rupiah{font-family:var(--mono);}
 </style>
 </head>
-<body>
+<body class="theme-emerald">
 
 <!-- LANDING SCREEN -->
 <div id="landing-screen">
@@ -231,8 +302,8 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
     <div class="landing-logo">
       <svg viewBox="0 0 24 24"><path stroke-width="2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14H11v-2h2v2zm0-4H11V8h2v4z"/><path stroke-width="2" d="M9 12l2 2 4-4"/></svg>
     </div>
-    <div class="landing-title">Fauzan Finance</div>
-    <div class="landing-sub">Laporan Keuangan Pribadi 2026</div>
+    <div class="landing-title">Dwitter</div>
+    <div class="landing-sub">Personal Finance</div>
     <div class="landing-form">
       <div>
         <label>Password Akses</label>
@@ -255,8 +326,8 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
     <div class="brand-icon">
       <svg viewBox="0 0 24 24"><path stroke-width="2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
     </div>
-    <h1>Fauzan Finance</h1>
-    <p>Keuangan Pribadi 2026</p>
+    <h1>Dwitter</h1>
+    <p>Personal Finance</p>
   </div>
 
   <div class="nav-menu">
@@ -302,7 +373,7 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
       <div class="user-avatar">F</div>
       <div>
         <div style="font-weight:700;font-size:0.8rem;color:var(--text-main);">Fauzan</div>
-        <div style="font-size:0.68rem;">Keuangan Pribadi</div>
+        <div style="font-size:0.68rem;">Personal Finance</div>
       </div>
     </div>
     <button class="btn btn-sm" style="width:100%;justify-content:center;margin-top:8px;" onclick="doLogout()">Keluar</button>
@@ -329,7 +400,12 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
           <option value="November">November</option><option value="Desember">Desember</option>
         </select>
         <select id="dash-tahun" onchange="loadDashboard()" style="padding:9px 14px;border:1px solid var(--border);border-radius:8px;font-family:var(--sans);font-size:0.84rem;background:var(--bg-card);">
-          <option value="2024">2024</option><option value="2025">2025</option><option value="2026" selected>2026</option>
+          <option value="2026" selected>2026</option>
+          <option value="2027">2027</option>
+          <option value="2028">2028</option>
+          <option value="2029">2029</option>
+          <option value="2030">2030</option>
+          <option value="2031">2031</option>
         </select>
         <button class="btn btn-primary" onclick="loadDashboard()">
           <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;"><polyline points="23 4 23 10 17 10" stroke-width="2"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" stroke-width="2"/></svg>
@@ -468,33 +544,6 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
         </button>
       </div>
     </div>
-
-    <!-- Tombol submit kedua (transaksi kedua jika ada) -->
-    <div class="card">
-      <div class="card-header">
-        <h3>Transaksi Kedua (Opsional)</h3>
-        <span style="font-size:0.75rem;color:var(--text-sub);">Jika ada transfer ke 2 rekening sekaligus</span>
-      </div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Jenis Transaksi 2</label>
-          <select id="in-transaksi2">
-            <option value="">-- Tidak Ada --</option>
-            <option value="Transfer">Transfer</option>
-            <option value="Cash">Cash</option>
-            <option value="QRIS">QRIS</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Nilai 2 (Rp)</label>
-          <input type="number" id="in-nilai2" placeholder="contoh: 270000" min="0">
-        </div>
-        <div class="form-group full">
-          <label>Uraian 2</label>
-          <input type="text" id="in-uraian2" placeholder="contoh: Uang Cash di Dompet">
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- ===== CATAT PENGELUARAN ===== -->
@@ -627,13 +676,23 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
         <h2>📅 Rekap Bulanan</h2>
         <p>Ringkasan keuangan per bulan sepanjang tahun</p>
       </div>
-      <button class="btn btn-primary" onclick="loadRekap()">
-        <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;"><polyline points="23 4 23 10 17 10" stroke-width="2"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" stroke-width="2"/></svg>
-        Refresh
-      </button>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <select id="rekap-tahun" onchange="loadRekap()" style="padding:9px 14px;border:1px solid var(--border);border-radius:8px;font-family:var(--sans);font-size:0.84rem;background:var(--bg-card);">
+          <option value="2026" selected>2026</option>
+          <option value="2027">2027</option>
+          <option value="2028">2028</option>
+          <option value="2029">2029</option>
+          <option value="2030">2030</option>
+          <option value="2031">2031</option>
+        </select>
+        <button class="btn btn-primary" onclick="loadRekap()">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;"><polyline points="23 4 23 10 17 10" stroke-width="2"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" stroke-width="2"/></svg>
+          Refresh
+        </button>
+      </div>
     </div>
     <div class="card">
-      <div class="card-header"><h3>Rekap Income vs Pengeluaran 2026</h3></div>
+      <div class="card-header"><h3 id="rekap-title-header">Rekap Income vs Pengeluaran 2026</h3></div>
       <div class="table-wrapper">
         <table>
           <thead><tr><th>Bulan</th><th>Income</th><th>Alokasi Tabungan</th><th>Alokasi Keinginan</th><th>Alokasi Kebutuhan</th><th>Total Realisasi</th><th>Saldo</th><th>%</th></tr></thead>
@@ -675,53 +734,54 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
       </div>
     </div>
 
-    <!-- Budget Allocation Setup -->
+    <!-- Budget Allocation Setup (Stored Online) -->
     <div class="card">
-      <div class="card-header"><h3>📊 Proporsi Alokasi Anggaran (Total harus 100%)</h3></div>
+      <div class="card-header"><h3>📊 Proporsi Alokasi Anggaran (Tersimpan di Spreadsheet · Total 100%)</h3></div>
       <div class="form-grid">
         <div class="form-group">
           <label>Alokasi Tabungan (%) *</label>
-          <input type="number" id="setting-pct-tabungan" min="0" max="100" placeholder="contoh: 30">
+          <input type="number" id="setting-pct-tabungan" min="0" max="100" placeholder="Loading...">
         </div>
         <div class="form-group">
           <label>Alokasi Keinginan (%) *</label>
-          <input type="number" id="setting-pct-keinginan" min="0" max="100" placeholder="contoh: 20">
+          <input type="number" id="setting-pct-keinginan" min="0" max="100" placeholder="Loading...">
         </div>
         <div class="form-group">
           <label>Alokasi Kebutuhan (%) *</label>
-          <input type="number" id="setting-pct-kebutuhan" min="0" max="100" placeholder="contoh: 50">
+          <input type="number" id="setting-pct-kebutuhan" min="0" max="100" placeholder="Loading...">
         </div>
-        <div class="form-group" style="justify-content: center; display: flex;">
-          <div class="hint" style="font-weight: 700; color: var(--primary);">Persentase ini digunakan untuk membagi otomatis transaksi pemasukan yang bertipe "Auto".</div>
+        <div class="form-group full" style="display: flex; align-items: center; justify-content: center; text-align: center;">
+          <div class="hint" style="font-weight: 700; color: var(--primary);">Persentase ini disimpan secara online langsung di tab 'Settings' spreadsheet Anda!</div>
         </div>
       </div>
       <div class="form-footer">
-        <button class="btn btn-primary" onclick="saveAllocationSettings()">Simpan Alokasi</button>
+        <button class="btn btn-primary" onclick="saveAllocationSettings()">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke-width="2"/></svg>
+          Simpan Alokasi Online
+        </button>
       </div>
     </div>
 
-    <!-- Panduan Setup -->
+    <!-- Tampilan Options (Dark mode, Theme palette, Compact Sidebar) -->
     <div class="card">
-      <div class="card-header"><h3>📖 Panduan Setup Google Apps Script</h3></div>
-      <div style="padding:24px;font-size:0.84rem;line-height:1.8;color:var(--text-sub);">
-        <p style="margin-bottom:16px;">Ikuti langkah berikut untuk menghubungkan web app ini ke Google Sheets kamu:</p>
-        <ol style="padding-left:20px;display:flex;flex-direction:column;gap:12px;">
-          <li>Buka Google Sheets Laporan Keuangan Fauzan 2026</li>
-          <li>Pastikan ada dua tab bernama <b>Data Income</b> dan <b>Expenses</b></li>
-          <li>Klik menu <b>Extensions → Apps Script</b></li>
-          <li>Hapus semua kode yang ada, lalu paste kode Apps Script di file AppScript.txt</li>
-          <li>Simpan, lalu klik <b>Deploy → New Deployment</b></li>
-          <li>Pilih type: <b>Web App</b>, Execute as: <b>Me</b>, Who has access: <b>Anyone</b></li>
-          <li>Klik Deploy, copy URL yang muncul</li>
-          <li>Paste URL tersebut di kolom "URL Google Apps Script" di atas</li>
-        </ol>
-      </div>
-    </div>
+      <div class="card-header"><h3>🎨 Tampilan & Kustomisasi</h3></div>
+      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:20px;">
+        <!-- Theme Selector -->
+        <div>
+          <div style="font-weight:600;font-size:0.85rem;margin-bottom:10px;">Palet Warna Aplikasi</div>
+          <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:12px;">Pilih warna dasar tema premium favorit Anda</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="theme-chip-btn active" style="background:#16a34a;" onclick="selectTheme('theme-emerald', this)"></button>
+            <button class="theme-chip-btn" style="background:#4f46e5;" onclick="selectTheme('theme-indigo', this)"></button>
+            <button class="theme-chip-btn" style="background:#e11d48;" onclick="selectTheme('theme-rose', this)"></button>
+            <button class="theme-chip-btn" style="background:#7c3aed;" onclick="selectTheme('theme-violet', this)"></button>
+            <button class="theme-chip-btn" style="background:#d97706;" onclick="selectTheme('theme-amber', this)"></button>
+          </div>
+        </div>
+        
+        <hr style="border:none; border-top:1px solid var(--border);">
 
-    <!-- App Settings -->
-    <div class="card">
-      <div class="card-header"><h3>🎨 Tampilan</h3></div>
-      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px;">
+        <!-- Dark Mode -->
         <div style="display:flex;align-items:center;justify-content:space-between;">
           <div>
             <div style="font-weight:600;font-size:0.85rem;">Mode Gelap</div>
@@ -732,6 +792,24 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
             <span class="toggle-slider"></span>
           </label>
         </div>
+
+        <hr style="border:none; border-top:1px solid var(--border);">
+
+        <!-- Sidebar Compact -->
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-weight:600;font-size:0.85rem;">Sidebar Ringkas (Compact)</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);">Perkecil sidebar untuk ruang kerja lebih luas</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-compact" onchange="toggleCompact(this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <hr style="border:none; border-top:1px solid var(--border);">
+
+        <!-- Access Password -->
         <div style="display:flex;align-items:center;justify-content:space-between;">
           <div>
             <div style="font-weight:600;font-size:0.85rem;">Password Akses</div>
@@ -739,6 +817,24 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
           </div>
           <button class="btn btn-sm" onclick="changePassword()">Ubah</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Panduan Setup -->
+    <div class="card">
+      <div class="card-header"><h3>📖 Panduan Setup Google Apps Script v2.1</h3></div>
+      <div style="padding:24px;font-size:0.84rem;line-height:1.8;color:var(--text-sub);">
+        <p style="margin-bottom:16px;">Ikuti langkah berikut untuk menghubungkan web app ini ke Google Sheets kamu:</p>
+        <ol style="padding-left:20px;display:flex;flex-direction:column;gap:12px;">
+          <li>Buka Google Sheets Laporan Keuangan</li>
+          <li>Pastikan ada tiga tab bernama: <b>Data Income</b>, <b>Expenses</b>, dan <b>Settings</b> (jika 'Settings' belum ada, sistem Apps Script akan membuatnya otomatis)</li>
+          <li>Klik menu <b>Extensions → Apps Script</b></li>
+          <li>Hapus semua kode yang ada, lalu paste kode Apps Script terbaru di file AppScript.txt</li>
+          <li>Simpan, lalu klik <b>Deploy → New Deployment</b></li>
+          <li>Pilih type: <b>Web App</b>, Execute as: <b>Me</b>, Who has access: <b>Anyone</b></li>
+          <li>Klik Deploy, copy URL yang muncul</li>
+          <li>Paste URL tersebut di kolom "URL Google Apps Script" di atas</li>
+        </ol>
       </div>
     </div>
   </div>
@@ -757,6 +853,7 @@ let GSHEET_URL = '';
 let SHEET_ID_VAL = '';
 let allIncomeData = [];
 let allExpensesData = [];
+let ALLOC_PCT = { tabungan: 30, keinginan: 20, kebutuhan: 50 }; // Shared global state of allocations
 
 // =============================================
 // LOGIN
@@ -790,7 +887,7 @@ function changePassword() {
 // =============================================
 // INIT
 // =============================================
-function initApp() {
+async function initApp() {
   GSHEET_URL = localStorage.getItem('fauzan_gsheet_url') || '';
   SHEET_ID_VAL = localStorage.getItem('fauzan_sheet_id') || '';
   
@@ -800,16 +897,30 @@ function initApp() {
     document.getElementById('setting-sheet-id').value = SHEET_ID_VAL;
   }
   
-  // Load percentage allocations
-  const pctTabungan = localStorage.getItem('fauzan_pct_tabungan') || '30';
-  const pctKeinginan = localStorage.getItem('fauzan_pct_keinginan') || '20';
-  const pctKebutuhan = localStorage.getItem('fauzan_pct_kebutuhan') || '50';
+  // Dynamic Auto-select current Month and Year
+  const now = new Date();
+  const currentMonthName = BULAN_LIST[now.getMonth()];
+  const currentYear = now.getFullYear().toString();
   
-  if (document.getElementById('setting-pct-tabungan')) {
-    document.getElementById('setting-pct-tabungan').value = pctTabungan;
-    document.getElementById('setting-pct-keinginan').value = pctKeinginan;
-    document.getElementById('setting-pct-kebutuhan').value = pctKebutuhan;
+  const dashBulan = document.getElementById('dash-bulan');
+  const dashTahun = document.getElementById('dash-tahun');
+  const rekapTahun = document.getElementById('rekap-tahun');
+
+  if (dashBulan) dashBulan.value = currentMonthName;
+  if (dashTahun && [...dashTahun.options].some(opt => opt.value === currentYear)) {
+    dashTahun.value = currentYear;
   }
+  if (rekapTahun && [...rekapTahun.options].some(opt => opt.value === currentYear)) {
+    rekapTahun.value = currentYear;
+  }
+
+  // Load Theme
+  const currentTheme = localStorage.getItem('fauzan_theme') || 'theme-emerald';
+  document.body.className = currentTheme;
+  document.querySelectorAll('.theme-chip-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.getAttribute('onclick').includes(currentTheme)) btn.classList.add('active');
+  });
 
   // Dark mode
   if (localStorage.getItem('fauzan_dark') === '1') {
@@ -817,13 +928,23 @@ function initApp() {
     const t = document.getElementById('toggle-dark');
     if (t) t.checked = true;
   }
-  // Set today
-  const today = new Date().toISOString().split('T')[0];
+
+  // Compact Sidebar
+  if (localStorage.getItem('fauzan_compact') === '1') {
+    document.body.classList.add('sidebar-compact');
+    const t = document.getElementById('toggle-compact');
+    if (t) t.checked = true;
+  }
+
+  // Set today for transaction forms
+  const today = now.toISOString().split('T')[0];
   const inTgl = document.getElementById('in-tanggal');
   const outTgl = document.getElementById('out-tanggal');
   if (inTgl) { inTgl.value = today; updateBulan('in-tanggal', 'in-bulan'); inTgl.addEventListener('change', () => updateBulan('in-tanggal', 'in-bulan')); }
   if (outTgl) { outTgl.value = today; updateBulan('out-tanggal', 'out-bulan'); outTgl.addEventListener('change', () => updateBulan('out-tanggal', 'out-bulan')); }
   
+  // Load allocation settings online first, then dashboard
+  await loadAllocationSettingsOnline();
   loadDashboard();
 }
 
@@ -854,7 +975,7 @@ function closeSidebar() {
 }
 
 // =============================================
-// API CALLS (Bypasses CORS OPTIONS with text/plain & carries custom percentages)
+// API CALLS (Bypasses CORS OPTIONS with text/plain)
 // =============================================
 async function callAPI(params) {
   if (!GSHEET_URL) {
@@ -862,18 +983,7 @@ async function callAPI(params) {
     return null;
   }
   try {
-    const pctTabungan = localStorage.getItem('fauzan_pct_tabungan') || '30';
-    const pctKeinginan = localStorage.getItem('fauzan_pct_keinginan') || '20';
-    const pctKebutuhan = localStorage.getItem('fauzan_pct_kebutuhan') || '50';
-
-    const fullParams = {
-      ...params,
-      pctTabungan,
-      pctKeinginan,
-      pctKebutuhan
-    };
-
-    const url = GSHEET_URL + '?' + new URLSearchParams(fullParams).toString();
+    const url = GSHEET_URL + '?' + new URLSearchParams(params).toString();
     const res = await fetch(url);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return await res.json();
@@ -886,20 +996,9 @@ async function callAPI(params) {
 async function callAPIPost(data) {
   if (!GSHEET_URL) { showToast('URL Google Sheets belum dikonfigurasi', 'error'); return null; }
   try {
-    const pctTabungan = localStorage.getItem('fauzan_pct_tabungan') || '30';
-    const pctKeinginan = localStorage.getItem('fauzan_pct_keinginan') || '20';
-    const pctKebutuhan = localStorage.getItem('fauzan_pct_kebutuhan') || '50';
-
-    const fullData = {
-      ...data,
-      pctTabungan,
-      pctKeinginan,
-      pctKebutuhan
-    };
-
     const res = await fetch(GSHEET_URL, {
       method: 'POST',
-      body: JSON.stringify(fullData),
+      body: JSON.stringify(data),
       headers: { 'Content-Type': 'text/plain' } // Bypasses CORS Preflight OPTIONS
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -908,6 +1007,77 @@ async function callAPIPost(data) {
     showToast('Gagal: ' + e.message, 'error');
     return null;
   }
+}
+
+// =============================================
+// ONLINE SETTINGS (Spreadsheet Storage)
+// =============================================
+async function loadAllocationSettingsOnline() {
+  if (!GSHEET_URL) {
+    // Populate demo defaults
+    updateAllocationLabels();
+    return;
+  }
+  const data = await callAPI({ action: 'getAllocation' });
+  if (data && !data.error) {
+    ALLOC_PCT.tabungan = data.pctTabungan;
+    ALLOC_PCT.keinginan = data.pctKeinginan;
+    ALLOC_PCT.kebutuhan = data.pctKebutuhan;
+    
+    if (document.getElementById('setting-pct-tabungan')) {
+      document.getElementById('setting-pct-tabungan').value = data.pctTabungan;
+      document.getElementById('setting-pct-keinginan').value = data.pctKeinginan;
+      document.getElementById('setting-pct-kebutuhan').value = data.pctKebutuhan;
+    }
+    updateAllocationLabels();
+  } else {
+    // Fallback to defaults
+    updateAllocationLabels();
+  }
+}
+
+async function saveAllocationSettings() {
+  const tab = document.getElementById('setting-pct-tabungan').value.trim();
+  const kei = document.getElementById('setting-pct-keinginan').value.trim();
+  const keb = document.getElementById('setting-pct-kebutuhan').value.trim();
+
+  if (!tab || !kei || !keb) {
+    showToast('Lengkapi semua alokasi', 'error'); return;
+  }
+
+  const sum = Number(tab) + Number(kei) + Number(keb);
+  if (sum !== 100) {
+    showToast('Gagal: Total alokasi harus berjumlah 100% (sekarang: ' + sum + '%)', 'error');
+    return;
+  }
+
+  const btn = document.querySelector('button[onclick="saveAllocationSettings()"]');
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spin"></span> Menyimpan Online...';
+
+  const result = await callAPIPost({ action: 'saveAllocation', pctTabungan: +tab, pctKeinginan: +kei, pctKebutuhan: +keb });
+
+  btn.disabled = false;
+  btn.innerHTML = originalText;
+
+  if (result?.success) {
+    ALLOC_PCT.tabungan = +tab;
+    ALLOC_PCT.keinginan = +kei;
+    ALLOC_PCT.kebutuhan = +keb;
+    updateAllocationLabels();
+    showToast('Proporsi alokasi berhasil disimpan online ✓', 'success');
+    loadDashboard();
+  } else {
+    showToast('Gagal menyimpan alokasi online', 'error');
+  }
+}
+
+function updateAllocationLabels() {
+  document.getElementById('dash-pct-label').textContent = `Tabungan ${ALLOC_PCT.tabungan}% · Keinginan ${ALLOC_PCT.keinginan}% · Kebutuhan ${ALLOC_PCT.kebutuhan}%`;
+  document.getElementById('a-tabungan-title').textContent = `💰 Tabungan (${ALLOC_PCT.tabungan}%)`;
+  document.getElementById('a-keinginan-title').textContent = `🎯 Keinginan (${ALLOC_PCT.keinginan}%)`;
+  document.getElementById('a-kebutuhan-title').textContent = `🏠 Kebutuhan (${ALLOC_PCT.kebutuhan}%)`;
 }
 
 // =============================================
@@ -933,11 +1103,11 @@ async function loadDashboard() {
 }
 
 function loadDashboardDemo() {
-  const pctTab = Number(localStorage.getItem('fauzan_pct_tabungan') || '30');
-  const pctKei = Number(localStorage.getItem('fauzan_pct_keinginan') || '20');
-  const pctKeb = Number(localStorage.getItem('fauzan_pct_kebutuhan') || '50');
+  const pctTab = ALLOC_PCT.tabungan;
+  const pctKei = ALLOC_PCT.keinginan;
+  const pctKeb = ALLOC_PCT.kebutuhan;
 
-  const totalIncome = 1000000;
+  const totalIncome = 1500000;
   renderDashboard({
     income: totalIncome, realisasi: 30000, alokasi: totalIncome, saldo: totalIncome - 30000,
     tabungan: { alokasi: totalIncome * (pctTab / 100), realisasi: 0, sisa: totalIncome * (pctTab / 100) },
@@ -947,15 +1117,7 @@ function loadDashboardDemo() {
 }
 
 function renderDashboard(d) {
-  const pctTabungan = localStorage.getItem('fauzan_pct_tabungan') || '30';
-  const pctKeinginan = localStorage.getItem('fauzan_pct_keinginan') || '20';
-  const pctKebutuhan = localStorage.getItem('fauzan_pct_kebutuhan') || '50';
-
-  // Dynamic labels based on settings!
-  document.getElementById('dash-pct-label').textContent = `Tabungan ${pctTabungan}% · Keinginan ${pctKeinginan}% · Kebutuhan ${pctKebutuhan}%`;
-  document.getElementById('a-tabungan-title').textContent = `💰 Tabungan (${pctTabungan}%)`;
-  document.getElementById('a-keinginan-title').textContent = `🎯 Keinginan (${pctKeinginan}%)`;
-  document.getElementById('a-kebutuhan-title').textContent = `🏠 Kebutuhan (${pctKebutuhan}%)`;
+  updateAllocationLabels();
 
   document.getElementById('s-income').textContent = rp(d.income);
   document.getElementById('s-realisasi').textContent = rp(d.realisasi);
@@ -1016,9 +1178,6 @@ async function submitPemasukan() {
   const alokasi = document.getElementById('in-alokasi').value;
   const nilai = document.getElementById('in-nilai').value;
   const uraian = document.getElementById('in-uraian').value;
-  const transaksi2 = document.getElementById('in-transaksi2').value;
-  const nilai2 = document.getElementById('in-nilai2').value;
-  const uraian2 = document.getElementById('in-uraian2').value;
 
   if (!tanggal || !transaksi || !alokasi || !nilai) {
     showToast('Lengkapi field wajib (*)', 'error'); return;
@@ -1028,7 +1187,8 @@ async function submitPemasukan() {
   btn.disabled = true;
   btn.innerHTML = '<span class="loading-spin"></span> Menyimpan...';
 
-  const result = await callAPIPost({ action:'addIncome', tanggal, bulan, transaksi, alokasi, nilai:+nilai, uraian, transaksi2, nilai2:+nilai2||0, uraian2 });
+  // Dihapus parameter transaksi kedua karena fiturnya ditiadakan
+  const result = await callAPIPost({ action:'addIncome', tanggal, bulan, transaksi, alokasi, nilai:+nilai, uraian });
   
   btn.disabled = false;
   btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;"><polyline points="20 6 9 17 4 12" stroke-width="2"/></svg> Simpan Pemasukan';
@@ -1042,8 +1202,8 @@ async function submitPemasukan() {
 }
 
 function resetFormPemasukan() {
-  ['in-transaksi','in-alokasi','in-transaksi2'].forEach(id => document.getElementById(id).value = '');
-  ['in-nilai','in-uraian','in-nilai2','in-uraian2'].forEach(id => document.getElementById(id).value = '');
+  ['in-transaksi','in-alokasi'].forEach(id => document.getElementById(id).value = '');
+  ['in-nilai','in-uraian'].forEach(id => document.getElementById(id).value = '');
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('in-tanggal').value = today;
   updateBulan('in-tanggal','in-bulan');
@@ -1188,8 +1348,12 @@ function filterExpenses() {
 // =============================================
 async function loadRekap() {
   const tbody = document.getElementById('rekap-body');
+  const tahun = document.getElementById('rekap-tahun').value;
+  
+  document.getElementById('rekap-title-header').textContent = `Rekap Income vs Pengeluaran ${tahun}`;
   tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">Memuat data...</td></tr>';
-  const data = await callAPI({ action: 'getRekap' });
+  
+  const data = await callAPI({ action: 'getRekap', tahun: tahun });
   if (!data) {
     tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">Gagal memuat. Cek konfigurasi.</td></tr>';
     return;
@@ -1215,8 +1379,37 @@ async function loadRekap() {
 }
 
 // =============================================
-// SETTINGS
+// THEME SELECTOR & KUSTOMISASI
 // =============================================
+function selectTheme(themeName, btnElement) {
+  document.body.className = ''; // Reset all themes
+  
+  // Add back current dark mode if active
+  if (localStorage.getItem('fauzan_dark') === '1') {
+    document.body.classList.add('dark-mode');
+  }
+  if (localStorage.getItem('fauzan_compact') === '1') {
+    document.body.classList.add('sidebar-compact');
+  }
+
+  document.body.classList.add(themeName);
+  localStorage.setItem('fauzan_theme', themeName);
+
+  document.querySelectorAll('.theme-chip-btn').forEach(btn => btn.classList.remove('active'));
+  btnElement.classList.add('active');
+  showToast('Tema warna berhasil diubah', 'success');
+}
+
+function toggleDark(on) {
+  document.body.classList.toggle('dark-mode', on);
+  localStorage.setItem('fauzan_dark', on ? '1' : '0');
+}
+
+function toggleCompact(on) {
+  document.body.classList.toggle('sidebar-compact', on);
+  localStorage.setItem('fauzan_compact', on ? '1' : '0');
+}
+
 function saveSettings() {
   const url = document.getElementById('setting-gsheet-url').value.trim();
   const id = document.getElementById('setting-sheet-id').value.trim();
@@ -1229,29 +1422,6 @@ function saveSettings() {
   loadDashboard();
 }
 
-function saveAllocationSettings() {
-  const tab = document.getElementById('setting-pct-tabungan').value.trim();
-  const kei = document.getElementById('setting-pct-keinginan').value.trim();
-  const keb = document.getElementById('setting-pct-kebutuhan').value.trim();
-
-  if (!tab || !kei || !keb) {
-    showToast('Lengkapi semua alokasi', 'error'); return;
-  }
-
-  const sum = Number(tab) + Number(kei) + Number(keb);
-  if (sum !== 100) {
-    showToast('Gagal: Total alokasi harus berjumlah 100% (sekarang: ' + sum + '%)', 'error');
-    return;
-  }
-
-  localStorage.setItem('fauzan_pct_tabungan', tab);
-  localStorage.setItem('fauzan_pct_keinginan', kei);
-  localStorage.setItem('fauzan_pct_kebutuhan', keb);
-  
-  showToast('Proporsi alokasi berhasil disimpan ✓', 'success');
-  loadDashboard();
-}
-
 async function testConnection() {
   const url = document.getElementById('setting-gsheet-url').value.trim();
   if (!url) { showToast('Masukkan URL dulu', 'error'); return; }
@@ -1261,11 +1431,6 @@ async function testConnection() {
   if (data) {
     showToast('Koneksi berhasil! ✓', 'success');
   }
-}
-
-function toggleDark(on) {
-  document.body.classList.toggle('dark-mode', on);
-  localStorage.setItem('fauzan_dark', on ? '1' : '0');
 }
 
 // =============================================
