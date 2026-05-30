@@ -681,7 +681,7 @@ async function loginWithGoogle() {
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: window.location.href
+      redirectTo: window.location.origin + window.location.pathname
     }
   });
   if (error) {
@@ -698,6 +698,7 @@ async function doLogout() {
   document.getElementById('landing-screen').style.display = 'flex';
   document.getElementById('btn-google-login').style.display = 'flex';
   document.getElementById('landing-loading').style.display = 'none';
+  if (window.location.hash) history.replaceState(null, '', window.location.pathname);
 }
 
 // =============================================
@@ -714,6 +715,7 @@ async function boot() {
     currentUser = session.user;
     await initApp();
     document.getElementById('landing-screen').style.display = 'none';
+    if (window.location.hash) history.replaceState(null, '', window.location.pathname);
   } else {
     document.getElementById('btn-google-login').style.display = 'flex';
     document.getElementById('landing-loading').style.display = 'none';
@@ -725,6 +727,7 @@ async function boot() {
       currentUser = session.user;
       await initApp();
       document.getElementById('landing-screen').style.display = 'none';
+      if (window.location.hash) history.replaceState(null, '', window.location.pathname);
     } else if (event === 'SIGNED_OUT') {
       document.getElementById('landing-screen').style.display = 'flex';
       document.getElementById('btn-google-login').style.display = 'flex';
