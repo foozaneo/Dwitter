@@ -230,6 +230,54 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
 @keyframes spin{to{transform:rotate(360deg);}}
 .section-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
 .rupiah{font-family:var(--mono);}
+
+/* ========== PANEL MODAL (Goals & Envelopes) ========== */
+.panel-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;justify-content:flex-end;align-items:stretch;z-index:500;backdrop-filter:blur(3px);}
+.panel-overlay.open{display:flex;}
+.panel{background:var(--bg-card);width:100%;max-width:480px;display:flex;flex-direction:column;overflow:hidden;box-shadow:-8px 0 32px rgba(0,0,0,.12);}
+.panel-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;}
+.panel-header h3{font-size:1rem;font-weight:800;margin:0;}
+.panel-close{background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;color:var(--text-sub);font-size:1.2rem;line-height:1;transition:background .2s;}
+.panel-close:hover{background:var(--border);}
+.panel-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px;}
+.panel-footer{padding:16px 24px;border-top:1px solid var(--border);flex-shrink:0;}
+
+/* pool bar di atas panel */
+.pool-bar-wrap{background:var(--primary-light);border-radius:12px;padding:14px 16px;margin-bottom:4px;}
+.pool-bar-label{font-size:0.72rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+.pool-bar-amounts{display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:6px;}
+.pool-bar-amounts b{font-family:var(--mono);}
+
+/* goal card */
+.goal-card{background:var(--bg-body);border:1px solid var(--border);border-radius:12px;padding:14px 16px;transition:box-shadow .2s;}
+.goal-card:hover{box-shadow:var(--shadow-md);}
+.goal-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px;}
+.goal-card-name{font-size:0.9rem;font-weight:700;}
+.goal-card-actions{display:flex;gap:4px;flex-shrink:0;}
+.goal-card-amounts{display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-sub);margin-bottom:6px;}
+.goal-card-amounts b{font-family:var(--mono);color:var(--text-main);}
+.goal-card-meta{font-size:0.68rem;color:var(--text-muted);margin-top:6px;}
+
+/* envelope item */
+.envelope-item{background:var(--bg-body);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+.envelope-item-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;}
+.envelope-item-name{font-size:0.88rem;font-weight:700;}
+.envelope-item-amounts{display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-sub);margin-bottom:6px;}
+.envelope-item-amounts b{font-family:var(--mono);color:var(--text-main);}
+
+/* alokasi card clickable */
+.alokasi-card{cursor:pointer;}
+.alokasi-card .card-hint{font-size:0.65rem;color:var(--text-muted);margin-top:8px;display:flex;align-items:center;gap:4px;}
+
+/* form inline di panel */
+.panel-form{background:var(--bg-body);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.panel-form h4{font-size:0.82rem;font-weight:700;margin-bottom:12px;color:var(--text-sub);text-transform:uppercase;letter-spacing:.6px;}
+.panel-form .form-grid{padding:0;gap:12px;}
+.panel-form .form-footer{padding:12px 0 0;background:none;border:none;justify-content:flex-end;}
+
+body.dark-mode .pool-bar-wrap{background:rgba(22,163,74,.15);}
+body.dark-mode .goal-card,body.dark-mode .envelope-item,body.dark-mode .panel-form{background:var(--bg-input);}
+@media(max-width:600px){.panel{max-width:100%;}.panel-overlay.open{align-items:flex-end;}.panel{border-radius:20px 20px 0 0;max-height:90vh;}}
 </style>
 </head>
 <body class="theme-emerald">
@@ -270,6 +318,60 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
     <div class="confirm-actions">
       <button class="btn" onclick="closeConfirm()">Batal</button>
       <button class="btn btn-danger" id="confirm-ok-btn">Ya, Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL: TABUNGAN ===== -->
+<div class="panel-overlay" id="panel-tabungan" onclick="closePanelOnBg(event,'panel-tabungan')">
+  <div class="panel">
+    <div class="panel-header">
+      <h3>💰 Goals Tabungan</h3>
+      <button class="panel-close" onclick="closePanel('panel-tabungan')">✕</button>
+    </div>
+    <div class="panel-body" id="panel-tabungan-body">
+      <div style="text-align:center;padding:32px;color:var(--text-muted);">Memuat...</div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="showGoalForm('tabungan')">
+        + Tambah Goal Tabungan
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL: KEINGINAN ===== -->
+<div class="panel-overlay" id="panel-keinginan" onclick="closePanelOnBg(event,'panel-keinginan')">
+  <div class="panel">
+    <div class="panel-header">
+      <h3>🎯 Goals Keinginan</h3>
+      <button class="panel-close" onclick="closePanel('panel-keinginan')">✕</button>
+    </div>
+    <div class="panel-body" id="panel-keinginan-body">
+      <div style="text-align:center;padding:32px;color:var(--text-muted);">Memuat...</div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="showGoalForm('keinginan')">
+        + Tambah Goal Keinginan
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL: KEBUTUHAN ===== -->
+<div class="panel-overlay" id="panel-kebutuhan" onclick="closePanelOnBg(event,'panel-kebutuhan')">
+  <div class="panel">
+    <div class="panel-header">
+      <h3>🏠 Pos Kebutuhan</h3>
+      <button class="panel-close" onclick="closePanel('panel-kebutuhan')">✕</button>
+    </div>
+    <div class="panel-body" id="panel-kebutuhan-body">
+      <div style="text-align:center;padding:32px;color:var(--text-muted);">Memuat...</div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="showEnvelopeForm()">
+        + Tambah Pos Kebutuhan
+      </button>
     </div>
   </div>
 </div>
@@ -375,23 +477,26 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
       <span style="font-size:0.75rem;color:var(--text-sub);" id="dash-pct-label">Tabungan 30% · Keinginan 20% · Kebutuhan 50%</span>
     </div>
     <div class="alokasi-grid">
-      <div class="alokasi-card tabungan">
+      <div class="alokasi-card tabungan" onclick="openPanel('tabungan')">
         <div class="alokasi-title" id="a-tabungan-title">💰 Tabungan (30%)</div>
         <div class="alokasi-main"><div class="alokasi-amount rupiah" id="a-tabungan-alokasi">Rp 0</div><span class="badge badge-green" id="a-tabungan-pct">0%</span></div>
         <div style="font-size:0.72rem;color:var(--text-sub);margin-bottom:8px;">Realisasi: <b id="a-tabungan-real">Rp 0</b> · Sisa: <b id="a-tabungan-sisa">Rp 0</b></div>
         <div class="progress-wrap"><div class="progress-bar" id="bar-tabungan" style="width:0%"></div></div>
+        <div class="card-hint">👆 Klik untuk kelola goals tabungan</div>
       </div>
-      <div class="alokasi-card keinginan">
+      <div class="alokasi-card keinginan" onclick="openPanel('keinginan')">
         <div class="alokasi-title" id="a-keinginan-title">🎯 Keinginan (20%)</div>
         <div class="alokasi-main"><div class="alokasi-amount rupiah" id="a-keinginan-alokasi">Rp 0</div><span class="badge badge-blue" id="a-keinginan-pct">0%</span></div>
         <div style="font-size:0.72rem;color:var(--text-sub);margin-bottom:8px;">Realisasi: <b id="a-keinginan-real">Rp 0</b> · Sisa: <b id="a-keinginan-sisa">Rp 0</b></div>
         <div class="progress-wrap"><div class="progress-bar" id="bar-keinginan" style="width:0%"></div></div>
+        <div class="card-hint">👆 Klik untuk kelola goals keinginan</div>
       </div>
-      <div class="alokasi-card kebutuhan">
+      <div class="alokasi-card kebutuhan" onclick="openPanel('kebutuhan')">
         <div class="alokasi-title" id="a-kebutuhan-title">🏠 Kebutuhan (50%)</div>
         <div class="alokasi-main"><div class="alokasi-amount rupiah" id="a-kebutuhan-alokasi">Rp 0</div><span class="badge badge-amber" id="a-kebutuhan-pct">0%</span></div>
         <div style="font-size:0.72rem;color:var(--text-sub);margin-bottom:8px;">Realisasi: <b id="a-kebutuhan-real">Rp 0</b> · Sisa: <b id="a-kebutuhan-sisa">Rp 0</b></div>
         <div class="progress-wrap"><div class="progress-bar amber" id="bar-kebutuhan" style="width:0%"></div></div>
+        <div class="card-hint">👆 Klik untuk kelola pos kebutuhan</div>
       </div>
     </div>
 
@@ -466,9 +571,15 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
         </div>
         <div class="form-group">
           <label>Kategori *</label>
-          <select id="out-kategori">
+          <select id="out-kategori" onchange="toggleEnvelopeField()">
             <option value="">-- Pilih --</option>
             <option>Kebutuhan</option><option>Keinginan</option><option>Tabungan</option>
+          </select>
+        </div>
+        <div class="form-group" id="envelope-field" style="display:none;">
+          <label>Pos Kebutuhan</label>
+          <select id="out-envelope">
+            <option value="">-- Pilih pos (opsional) --</option>
           </select>
         </div>
         <div class="form-group"><label>Nilai (Rp) *</label><input type="number" id="out-nilai" placeholder="contoh: 50000" min="0"></div>
@@ -770,6 +881,7 @@ async function initApp() {
   // Load alokasi lalu dashboard
   await loadAllocationSettings();
   loadDashboard();
+  populateEnvelopeDropdown();
 }
 
 // =============================================
@@ -992,6 +1104,7 @@ async function submitPengeluaran() {
   const kategori = document.getElementById('out-kategori').value;
   const nilai    = document.getElementById('out-nilai').value;
   const uraian   = document.getElementById('out-uraian').value;
+  const envelope = document.getElementById('out-envelope')?.value || null;
   if (!tanggal||!transaksi||!kategori||!nilai) { showToast('Lengkapi field wajib (*)', 'error'); return; }
 
   const tahun = tanggal.split('-')[0];
@@ -999,7 +1112,8 @@ async function submitPengeluaran() {
   btn.disabled=true; btn.innerHTML='<span class="loading-spin"></span> Menyimpan...';
 
   const { error } = await sb.from('expenses').insert({
-    user_id: currentUser.id, tanggal, bulan, tahun, transaksi, kategori, nilai: +nilai, uraian
+    user_id: currentUser.id, tanggal, bulan, tahun, transaksi, kategori, nilai: +nilai, uraian,
+    envelope: kategori === 'Kebutuhan' && envelope ? envelope : null
   });
 
   btn.disabled=false;
@@ -1015,6 +1129,8 @@ function resetFormPengeluaran() {
   const today=new Date().toISOString().split('T')[0];
   document.getElementById('out-tanggal').value=today;
   updateBulan('out-tanggal','out-bulan');
+  document.getElementById('envelope-field').style.display = 'none';
+  if (document.getElementById('out-envelope')) document.getElementById('out-envelope').value = '';
 }
 
 // =============================================
@@ -1230,6 +1346,360 @@ function showToast(msg, type) {
   t.className = 'toast show' + (type?' '+type:'');
   clearTimeout(t._timer);
   t._timer = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+// =============================================
+// PANEL — open/close
+// =============================================
+function openPanel(tipe) {
+  closeAllPanels();
+  const el = document.getElementById('panel-' + tipe);
+  el.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (tipe === 'tabungan' || tipe === 'keinginan') loadGoalPanel(tipe);
+  else loadEnvelopePanel();
+}
+function closePanel(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeAllPanels() {
+  ['panel-tabungan','panel-keinginan','panel-kebutuhan'].forEach(closePanel);
+}
+function closePanelOnBg(e, id) {
+  if (e.target === document.getElementById(id)) closePanel(id);
+}
+
+// =============================================
+// GOALS — load & render
+// =============================================
+async function loadGoalPanel(tipe) {
+  const bodyEl = document.getElementById('panel-' + tipe + '-body');
+  bodyEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);">Memuat...</div>';
+
+  // Hitung pool dari semua income dengan alokasi tipe ini (lintas bulan)
+  const { data: incAll } = await sb.from('income')
+    .select('alokasi, nilai')
+    .eq('user_id', currentUser.id);
+
+  const pct = tipe === 'tabungan' ? ALLOC_PCT.tabungan / 100 : ALLOC_PCT.keinginan / 100;
+  let pool = 0;
+  (incAll || []).forEach(r => {
+    const v = Number(r.nilai) || 0;
+    if (r.alokasi === 'Auto' || r.alokasi === 'Auto (Gaji/Rutin)') pool += v * pct;
+    else if (r.alokasi === tipe.charAt(0).toUpperCase() + tipe.slice(1)) pool += v;
+  });
+
+  // Ambil goals + transaksi goal
+  const { data: goals } = await sb.from('goals')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .eq('tipe', tipe)
+    .eq('archived', false)
+    .order('created_at', { ascending: true });
+
+  const { data: txAll } = await sb.from('goal_transactions')
+    .select('goal_id, nilai')
+    .eq('user_id', currentUser.id);
+
+  // Hitung total terkumpul per goal
+  const terkumpulMap = {};
+  (txAll || []).forEach(t => {
+    terkumpulMap[t.goal_id] = (terkumpulMap[t.goal_id] || 0) + Number(t.nilai);
+  });
+
+  const totalDialokasikan = Object.values(terkumpulMap).reduce((a, b) => a + b, 0);
+  const poolSisa = pool - totalDialokasikan;
+
+  const badge = tipe === 'tabungan' ? 'badge-green' : 'badge-blue';
+  const barClass = tipe === 'tabungan' ? '' : 'blue';
+
+  let html = `
+    <div class="pool-bar-wrap">
+      <div class="pool-bar-label">Pool ${tipe} terkumpul</div>
+      <div class="pool-bar-amounts">
+        <span>Total pool: <b>${rp(pool)}</b></span>
+        <span>Sisa belum dialokasikan: <b style="color:${poolSisa >= 0 ? 'var(--green)' : 'var(--red)'}">${rp(poolSisa)}</b></span>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar ${barClass}" style="width:${pool > 0 ? Math.min(100, Math.round(totalDialokasikan / pool * 100)) : 0}%"></div></div>
+    </div>`;
+
+  if (!goals || goals.length === 0) {
+    html += `<div class="empty-state"><p>Belum ada goal. Tambahkan goal pertamamu!</p></div>`;
+  } else {
+    goals.forEach(g => {
+      const terk = terkumpulMap[g.id] || 0;
+      const pctGoal = g.target > 0 ? Math.min(100, Math.round(terk / g.target * 100)) : 0;
+      const sisa = g.target - terk;
+      const deadlineStr = g.deadline ? `· Deadline: ${fmtDate(g.deadline)}` : '';
+
+      // Estimasi bulan jika ada riwayat transaksi
+      let estimasiStr = '';
+      if (g.deadline && sisa > 0) {
+        const bulanSisa = Math.ceil((new Date(g.deadline) - new Date()) / (1000 * 60 * 60 * 24 * 30));
+        if (bulanSisa > 0) estimasiStr = `· Perlu nabung ~${rp(sisa / bulanSisa)}/bln`;
+      }
+
+      html += `
+        <div class="goal-card">
+          <div class="goal-card-top">
+            <div class="goal-card-name">${g.nama}</div>
+            <div class="goal-card-actions">
+              <button class="btn btn-sm btn-primary btn-icon" title="Tambah dana" onclick="showAddFundForm('${g.id}','${g.nama.replace(/'/g,"\\'")}',${poolSisa})">+Dana</button>
+              <button class="btn btn-sm btn-icon" title="Hapus goal" onclick="deleteGoal('${g.id}','${g.nama.replace(/'/g,"\\'")}','${tipe}')">🗑</button>
+            </div>
+          </div>
+          <div class="goal-card-amounts">
+            <span>Terkumpul: <b>${rp(terk)}</b></span>
+            <span>Target: <b>${rp(g.target)}</b></span>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-bar ${pctGoal >= 100 ? '' : barClass}" style="width:${pctGoal}%;background:${pctGoal >= 100 ? 'var(--green)' : ''}"></div>
+          </div>
+          <div class="goal-card-meta">
+            <span class="badge ${badge}">${pctGoal}%</span>
+            ${deadlineStr} ${estimasiStr}
+            ${g.catatan ? `<br><i style="color:var(--text-muted)">${g.catatan}</i>` : ''}
+          </div>
+        </div>`;
+    });
+  }
+
+  bodyEl.innerHTML = html;
+}
+
+function showGoalForm(tipe) {
+  const bodyEl = document.getElementById('panel-' + tipe + '-body');
+  const existing = bodyEl.querySelector('.panel-form');
+  if (existing) { existing.remove(); return; }
+
+  const form = document.createElement('div');
+  form.className = 'panel-form';
+  form.innerHTML = `
+    <h4>+ Goal Baru</h4>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+      <div class="form-group full"><label>Nama Goal *</label><input type="text" id="gf-nama" placeholder="contoh: Motor, Rumah, Saham..."></div>
+      <div class="form-group"><label>Target (Rp) *</label><input type="number" id="gf-target" placeholder="5000000" min="0"></div>
+      <div class="form-group"><label>Deadline (opsional)</label><input type="date" id="gf-deadline"></div>
+      <div class="form-group full"><label>Catatan</label><input type="text" id="gf-catatan" placeholder="opsional"></div>
+    </div>
+    <div class="form-footer">
+      <button class="btn" onclick="this.closest('.panel-form').remove()">Batal</button>
+      <button class="btn btn-primary" onclick="saveGoal('${tipe}')">Simpan Goal</button>
+    </div>`;
+  bodyEl.insertBefore(form, bodyEl.firstChild);
+  form.querySelector('#gf-nama').focus();
+}
+
+async function saveGoal(tipe) {
+  const nama    = document.getElementById('gf-nama').value.trim();
+  const target  = document.getElementById('gf-target').value;
+  const deadline= document.getElementById('gf-deadline').value || null;
+  const catatan = document.getElementById('gf-catatan').value.trim();
+  if (!nama || !target) { showToast('Nama dan target wajib diisi', 'error'); return; }
+
+  const { error } = await sb.from('goals').insert({
+    user_id: currentUser.id, tipe, nama, target: +target, deadline, catatan: catatan || null
+  });
+  if (error) { showToast('Gagal: ' + error.message, 'error'); return; }
+  showToast('Goal berhasil ditambahkan ✓', 'success');
+  loadGoalPanel(tipe);
+}
+
+function showAddFundForm(goalId, goalNama, poolSisa) {
+  const existing = document.getElementById('add-fund-form-' + goalId);
+  if (existing) { existing.remove(); return; }
+
+  const card = [...document.querySelectorAll('.goal-card')].find(c => c.querySelector(`[onclick*="${goalId}"]`));
+  if (!card) return;
+
+  const form = document.createElement('div');
+  form.id = 'add-fund-form-' + goalId;
+  form.className = 'panel-form';
+  form.style.marginTop = '8px';
+  form.innerHTML = `
+    <h4>+ Tambah Dana ke "${goalNama}"</h4>
+    <p style="font-size:0.75rem;color:var(--text-sub);margin-bottom:10px;">Pool tersedia: <b style="font-family:var(--mono)">${rp(poolSisa)}</b></p>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+      <div class="form-group"><label>Tanggal *</label><input type="date" id="af-tanggal-${goalId}" value="${new Date().toISOString().split('T')[0]}"></div>
+      <div class="form-group"><label>Jumlah (Rp) *</label><input type="number" id="af-nilai-${goalId}" placeholder="500000" min="0"></div>
+      <div class="form-group full"><label>Catatan</label><input type="text" id="af-catatan-${goalId}" placeholder="opsional"></div>
+    </div>
+    <div class="form-footer">
+      <button class="btn" onclick="document.getElementById('add-fund-form-${goalId}').remove()">Batal</button>
+      <button class="btn btn-primary" onclick="saveGoalFund('${goalId}')">Tambah Dana</button>
+    </div>`;
+  card.insertAdjacentElement('afterend', form);
+  form.querySelector(`#af-nilai-${goalId}`).focus();
+}
+
+async function saveGoalFund(goalId) {
+  const tanggal = document.getElementById(`af-tanggal-${goalId}`).value;
+  const nilai   = document.getElementById(`af-nilai-${goalId}`).value;
+  const catatan = document.getElementById(`af-catatan-${goalId}`).value.trim();
+  if (!tanggal || !nilai || +nilai <= 0) { showToast('Tanggal dan jumlah wajib diisi', 'error'); return; }
+
+  const { error } = await sb.from('goal_transactions').insert({
+    user_id: currentUser.id, goal_id: goalId, tanggal, nilai: +nilai, catatan: catatan || null
+  });
+  if (error) { showToast('Gagal: ' + error.message, 'error'); return; }
+  showToast('Dana berhasil ditambahkan ✓', 'success');
+
+  // Reload panel yang sedang terbuka
+  const openPanel = ['tabungan','keinginan'].find(t =>
+    document.getElementById('panel-' + t)?.classList.contains('open')
+  );
+  if (openPanel) loadGoalPanel(openPanel);
+}
+
+async function deleteGoal(goalId, nama, tipe) {
+  if (!confirm(`Hapus goal "${nama}"? Semua dana yang sudah dialokasikan ke goal ini juga akan dihapus.`)) return;
+  await sb.from('goal_transactions').delete().eq('goal_id', goalId);
+  await sb.from('goals').delete().eq('id', goalId).eq('user_id', currentUser.id);
+  showToast('Goal dihapus ✓', 'success');
+  loadGoalPanel(tipe);
+}
+
+// =============================================
+// ENVELOPES — load & render
+// =============================================
+async function loadEnvelopePanel() {
+  const bodyEl = document.getElementById('panel-kebutuhan-body');
+  bodyEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);">Memuat...</div>';
+
+  // Pool kebutuhan dari semua income
+  const { data: incAll } = await sb.from('income').select('alokasi,nilai').eq('user_id', currentUser.id);
+  const pct = ALLOC_PCT.kebutuhan / 100;
+  let pool = 0;
+  (incAll || []).forEach(r => {
+    const v = Number(r.nilai) || 0;
+    if (r.alokasi === 'Auto' || r.alokasi === 'Auto (Gaji/Rutin)') pool += v * pct;
+    else if (r.alokasi === 'Kebutuhan') pool += v;
+  });
+
+  const { data: envs } = await sb.from('envelopes')
+    .select('*').eq('user_id', currentUser.id).order('urutan', { ascending: true });
+
+  // Pengeluaran bulan ini per envelope
+  const now = new Date();
+  const bulan = BULAN_LIST[now.getMonth()];
+  const tahun = now.getFullYear().toString();
+  const { data: expAll } = await sb.from('expenses')
+    .select('envelope, nilai')
+    .eq('user_id', currentUser.id)
+    .eq('kategori', 'Kebutuhan')
+    .eq('bulan', bulan)
+    .eq('tahun', tahun);
+
+  const realMap = {};
+  (expAll || []).forEach(r => {
+    if (r.envelope) realMap[r.envelope] = (realMap[r.envelope] || 0) + Number(r.nilai);
+  });
+
+  const totalBudget = (envs || []).reduce((a, e) => a + Number(e.budget), 0);
+  const totalReal   = Object.values(realMap).reduce((a, b) => a + b, 0);
+
+  let html = `
+    <div class="pool-bar-wrap">
+      <div class="pool-bar-label">Kebutuhan — ${bulan} ${tahun}</div>
+      <div class="pool-bar-amounts">
+        <span>Pool: <b>${rp(pool)}</b></span>
+        <span>Terpakai: <b style="color:var(--red)">${rp(totalReal)}</b></span>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar amber" style="width:${pool > 0 ? Math.min(100, Math.round(totalReal / pool * 100)) : 0}%"></div></div>
+    </div>`;
+
+  if (!envs || envs.length === 0) {
+    html += `<div class="empty-state"><p>Belum ada pos kebutuhan. Tambahkan pos pertama!</p></div>`;
+  } else {
+    envs.forEach(e => {
+      const real = realMap[e.nama] || 0;
+      const pctE = e.budget > 0 ? Math.min(100, Math.round(real / e.budget * 100)) : 0;
+      const over = real > e.budget;
+      html += `
+        <div class="envelope-item">
+          <div class="envelope-item-top">
+            <div class="envelope-item-name">${e.nama}</div>
+            <div style="display:flex;gap:4px;">
+              <span class="badge ${over ? 'badge-red' : pctE > 80 ? 'badge-amber' : 'badge-green'}">${pctE}%</span>
+              <button class="btn btn-icon btn-sm" onclick="deleteEnvelope('${e.id}','${e.nama.replace(/'/g,"\\'")}')">🗑</button>
+            </div>
+          </div>
+          <div class="envelope-item-amounts">
+            <span>Terpakai: <b style="color:${over ? 'var(--red)' : 'var(--text-main)'}">${rp(real)}</b></span>
+            <span>Budget/bln: <b>${rp(e.budget)}</b></span>
+          </div>
+          <div class="progress-wrap"><div class="progress-bar ${over ? 'red' : 'amber'}" style="width:${pctE}%"></div></div>
+        </div>`;
+    });
+  }
+
+  bodyEl.innerHTML = html;
+}
+
+function showEnvelopeForm() {
+  const bodyEl = document.getElementById('panel-kebutuhan-body');
+  const existing = bodyEl.querySelector('.panel-form');
+  if (existing) { existing.remove(); return; }
+
+  const form = document.createElement('div');
+  form.className = 'panel-form';
+  form.innerHTML = `
+    <h4>+ Pos Baru</h4>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+      <div class="form-group"><label>Nama Pos *</label><input type="text" id="ef-nama" placeholder="contoh: Kos, Makan, Transport..."></div>
+      <div class="form-group"><label>Budget/Bulan (Rp) *</label><input type="number" id="ef-budget" placeholder="500000" min="0"></div>
+    </div>
+    <div class="form-footer">
+      <button class="btn" onclick="this.closest('.panel-form').remove()">Batal</button>
+      <button class="btn btn-primary" onclick="saveEnvelope()">Simpan Pos</button>
+    </div>`;
+  bodyEl.insertBefore(form, bodyEl.firstChild);
+  form.querySelector('#ef-nama').focus();
+}
+
+async function saveEnvelope() {
+  const nama   = document.getElementById('ef-nama').value.trim();
+  const budget = document.getElementById('ef-budget').value;
+  if (!nama || !budget) { showToast('Nama dan budget wajib diisi', 'error'); return; }
+
+  const { data: existing } = await sb.from('envelopes').select('urutan').eq('user_id', currentUser.id).order('urutan', { ascending: false }).limit(1);
+  const urutan = existing && existing.length ? existing[0].urutan + 1 : 0;
+
+  const { error } = await sb.from('envelopes').insert({
+    user_id: currentUser.id, nama, budget: +budget, urutan
+  });
+  if (error) { showToast('Gagal: ' + error.message, 'error'); return; }
+  showToast('Pos kebutuhan ditambahkan ✓', 'success');
+  loadEnvelopePanel();
+  await populateEnvelopeDropdown(); // update dropdown di form pengeluaran
+}
+
+async function deleteEnvelope(id, nama) {
+  if (!confirm(`Hapus pos "${nama}"? Data pengeluaran yang terhubung tidak ikut terhapus.`)) return;
+  await sb.from('envelopes').delete().eq('id', id).eq('user_id', currentUser.id);
+  showToast('Pos dihapus ✓', 'success');
+  loadEnvelopePanel();
+  await populateEnvelopeDropdown();
+}
+
+// Populate dropdown envelope di form pengeluaran
+async function populateEnvelopeDropdown() {
+  const sel = document.getElementById('out-envelope');
+  if (!sel) return;
+  const { data } = await sb.from('envelopes').select('nama').eq('user_id', currentUser.id).order('urutan', { ascending: true });
+  sel.innerHTML = '<option value="">-- Pilih pos (opsional) --</option>';
+  (data || []).forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = e.nama;
+    opt.textContent = e.nama;
+    sel.appendChild(opt);
+  });
+}
+
+function toggleEnvelopeField() {
+  const kat = document.getElementById('out-kategori').value;
+  document.getElementById('envelope-field').style.display = kat === 'Kebutuhan' ? '' : 'none';
 }
 
 // =============================================
