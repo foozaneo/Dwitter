@@ -1,5 +1,3 @@
-html
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -373,23 +371,23 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
     <!-- Alokasi per Kategori -->
     <div class="section-row">
       <h3 style="font-size:0.95rem;font-weight:700;">Alokasi Anggaran</h3>
-      <span style="font-size:0.75rem;color:var(--text-sub);">Tabungan 30% · Keinginan 20% · Kebutuhan 50%</span>
+      <span style="font-size:0.75rem;color:var(--text-sub);" id="dash-pct-label">Tabungan 30% · Keinginan 20% · Kebutuhan 50%</span>
     </div>
     <div class="alokasi-grid" id="dash-alokasi">
       <div class="alokasi-card tabungan">
-        <div class="alokasi-title">💰 Tabungan (30%)</div>
+        <div class="alokasi-title" id="a-tabungan-title">💰 Tabungan (30%)</div>
         <div class="alokasi-main"><div class="alokasi-amount rupiah" id="a-tabungan-alokasi">Rp 0</div><span class="badge badge-green" id="a-tabungan-pct">0%</span></div>
         <div style="font-size:0.72rem;color:var(--text-sub);margin-bottom:8px;">Realisasi: <b id="a-tabungan-real">Rp 0</b> · Sisa: <b id="a-tabungan-sisa">Rp 0</b></div>
         <div class="progress-wrap"><div class="progress-bar" id="bar-tabungan" style="width:0%"></div></div>
       </div>
       <div class="alokasi-card keinginan">
-        <div class="alokasi-title">🎯 Keinginan (20%)</div>
+        <div class="alokasi-title" id="a-keinginan-title">🎯 Keinginan (20%)</div>
         <div class="alokasi-main"><div class="alokasi-amount rupiah" id="a-keinginan-alokasi">Rp 0</div><span class="badge badge-blue" id="a-keinginan-pct">0%</span></div>
         <div style="font-size:0.72rem;color:var(--text-sub);margin-bottom:8px;">Realisasi: <b id="a-keinginan-real">Rp 0</b> · Sisa: <b id="a-keinginan-sisa">Rp 0</b></div>
         <div class="progress-wrap"><div class="progress-bar" id="bar-keinginan" style="width:0%;background:var(--blue)"></div></div>
       </div>
       <div class="alokasi-card kebutuhan">
-        <div class="alokasi-title">🏠 Kebutuhan (50%)</div>
+        <div class="alokasi-title" id="a-kebutuhan-title">🏠 Kebutuhan (50%)</div>
         <div class="alokasi-main"><div class="alokasi-amount rupiah" id="a-kebutuhan-alokasi">Rp 0</div><span class="badge badge-amber" id="a-kebutuhan-pct">0%</span></div>
         <div style="font-size:0.72rem;color:var(--text-sub);margin-bottom:8px;">Realisasi: <b id="a-kebutuhan-real">Rp 0</b> · Sisa: <b id="a-kebutuhan-sisa">Rp 0</b></div>
         <div class="progress-wrap"><div class="progress-bar amber" id="bar-kebutuhan" style="width:0%"></div></div>
@@ -656,7 +654,7 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
       </div>
     </div>
 
-    <!-- Google Sheets Setup -->
+    <!-- Google Sheets Connection -->
     <div class="card">
       <div class="card-header"><h3>🔗 Koneksi Google Sheets</h3></div>
       <div class="form-grid">
@@ -677,6 +675,31 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
       </div>
     </div>
 
+    <!-- Budget Allocation Setup -->
+    <div class="card">
+      <div class="card-header"><h3>📊 Proporsi Alokasi Anggaran (Total harus 100%)</h3></div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Alokasi Tabungan (%) *</label>
+          <input type="number" id="setting-pct-tabungan" min="0" max="100" placeholder="contoh: 30">
+        </div>
+        <div class="form-group">
+          <label>Alokasi Keinginan (%) *</label>
+          <input type="number" id="setting-pct-keinginan" min="0" max="100" placeholder="contoh: 20">
+        </div>
+        <div class="form-group">
+          <label>Alokasi Kebutuhan (%) *</label>
+          <input type="number" id="setting-pct-kebutuhan" min="0" max="100" placeholder="contoh: 50">
+        </div>
+        <div class="form-group" style="justify-content: center; display: flex;">
+          <div class="hint" style="font-weight: 700; color: var(--primary);">Persentase ini digunakan untuk membagi otomatis transaksi pemasukan yang bertipe "Auto".</div>
+        </div>
+      </div>
+      <div class="form-footer">
+        <button class="btn btn-primary" onclick="saveAllocationSettings()">Simpan Alokasi</button>
+      </div>
+    </div>
+
     <!-- Panduan Setup -->
     <div class="card">
       <div class="card-header"><h3>📖 Panduan Setup Google Apps Script</h3></div>
@@ -684,160 +707,14 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
         <p style="margin-bottom:16px;">Ikuti langkah berikut untuk menghubungkan web app ini ke Google Sheets kamu:</p>
         <ol style="padding-left:20px;display:flex;flex-direction:column;gap:12px;">
           <li>Buka Google Sheets Laporan Keuangan Fauzan 2026</li>
+          <li>Pastikan ada dua tab bernama <b>Data Income</b> dan <b>Expenses</b></li>
           <li>Klik menu <b>Extensions → Apps Script</b></li>
-          <li>Hapus semua kode yang ada, lalu paste kode Apps Script di bawah ini</li>
+          <li>Hapus semua kode yang ada, lalu paste kode Apps Script di file AppScript.txt</li>
           <li>Simpan, lalu klik <b>Deploy → New Deployment</b></li>
           <li>Pilih type: <b>Web App</b>, Execute as: <b>Me</b>, Who has access: <b>Anyone</b></li>
           <li>Klik Deploy, copy URL yang muncul</li>
           <li>Paste URL tersebut di kolom "URL Google Apps Script" di atas</li>
         </ol>
-        <details style="margin-top:20px;">
-          <summary style="cursor:pointer;font-weight:700;color:var(--primary);font-size:0.9rem;">📋 Klik untuk lihat kode Apps Script</summary>
-          <pre style="margin-top:12px;background:#0f172a;color:#a3e635;padding:20px;border-radius:10px;font-size:0.75rem;overflow-x:auto;white-space:pre-wrap;line-height:1.6;" id="apps-script-code">
-const SHEET_ID = ''; // Isi dengan ID Spreadsheet kamu
-
-function doGet(e) {
-  return handleRequest(e);
-}
-function doPost(e) {
-  return handleRequest(e);
-}
-
-function handleRequest(e) {
-  const action = e.parameter.action || (e.postData ? JSON.parse(e.postData.contents).action : '');
-  let result;
-  try {
-    if (action === 'getDashboard') result = getDashboard(e.parameter);
-    else if (action === 'getIncome') result = getIncomeData();
-    else if (action === 'getExpenses') result = getExpensesData();
-    else if (action === 'getRekap') result = getRekapData();
-    else if (action === 'addIncome') result = addIncome(JSON.parse(e.postData.contents));
-    else if (action === 'addExpense') result = addExpense(JSON.parse(e.postData.contents));
-    else result = { error: 'Unknown action' };
-  } catch(err) {
-    result = { error: err.message };
-  }
-  return ContentService.createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-function getSheet(name) {
-  const ss = SHEET_ID ? SpreadsheetApp.openById(SHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();
-  return ss.getSheetByName(name);
-}
-
-function getDashboard(params) {
-  const bulan = params.bulan || 'April';
-  const incomeSheet = getSheet('Income');
-  const usageSheet = getSheet('Usage');
-  
-  // Get months header row to find column index
-  const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  const colIdx = months.indexOf(bulan) + 3; // offset: col A=1,B=2,C=3 → bulan mulai col C (idx 2)
-  
-  const incomeData = incomeSheet.getDataRange().getValues();
-  const usageData = usageSheet.getDataRange().getValues();
-  
-  // Find income total row
-  let totalIncome = 0, tabAlokasi = 0, keiAlokasi = 0, kebAlokasi = 0;
-  let tabReal = 0, keiReal = 0, kebReal = 0;
-  
-  for (let r = 0; r < incomeData.length; r++) {
-    const row = incomeData[r];
-    if (row[0] === 'Total') { totalIncome = row[colIdx] || 0; }
-    if (row[0] === 'Tabungan' && row[1] == 0.3) tabAlokasi = row[colIdx] || 0;
-    if (row[0] === 'Keinginan' && row[1] == 0.2) keiAlokasi = row[colIdx] || 0;
-    if (row[0] === 'Kebutuhan' && row[1] == 0.5) kebAlokasi = row[colIdx] || 0;
-  }
-  for (let r = 0; r < usageData.length; r++) {
-    const row = usageData[r];
-    if (row[0] === 'Tabungan') tabReal = row[colIdx] || 0;
-    if (row[0] === 'Keinginan') keiReal = row[colIdx] || 0;
-    if (row[0] === 'Kebutuhan') kebReal = row[colIdx] || 0;
-  }
-  
-  const totalReal = tabReal + keiReal + kebReal;
-  const saldo = totalIncome - totalReal;
-  
-  return {
-    income: totalIncome, realisasi: totalReal,
-    alokasi: tabAlokasi + keiAlokasi + kebAlokasi, saldo,
-    tabungan: { alokasi: tabAlokasi, realisasi: tabReal, sisa: tabAlokasi - tabReal },
-    keinginan: { alokasi: keiAlokasi, realisasi: keiReal, sisa: keiAlokasi - keiReal },
-    kebutuhan: { alokasi: kebAlokasi, realisasi: kebReal, sisa: kebAlokasi - kebReal }
-  };
-}
-
-function getIncomeData() {
-  const sheet = getSheet('Data Income');
-  const data = sheet.getDataRange().getValues();
-  const rows = [];
-  for (let i = 1; i < data.length; i++) {
-    const r = data[i];
-    if (r[0] || r[4]) rows.push({
-      tanggal: r[0] ? Utilities.formatDate(new Date(r[0]), 'Asia/Jakarta', 'dd/MM/yyyy') : '',
-      bulan: r[1], alokasi: r[4], transaksi: r[2], nilai: r[5], uraian: r[3]
-    });
-  }
-  return rows;
-}
-
-function getExpensesData() {
-  const sheet = getSheet('Expenses');
-  const data = sheet.getDataRange().getValues();
-  const rows = [];
-  for (let i = 1; i < data.length; i++) {
-    const r = data[i];
-    if (r[0] || r[5]) rows.push({
-      tanggal: r[0] ? Utilities.formatDate(new Date(r[0]), 'Asia/Jakarta', 'dd/MM/yyyy') : '',
-      bulan: r[1], kategori: r[4], transaksi: r[2], nilai: r[5], uraian: r[3]
-    });
-  }
-  return rows;
-}
-
-function getRekapData() {
-  const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-  const incomeSheet = getSheet('Income');
-  const usageSheet = getSheet('Usage');
-  const incomeData = incomeSheet.getDataRange().getValues();
-  const usageData = usageSheet.getDataRange().getValues();
-  
-  return months.map((bulan, i) => {
-    const col = i + 3;
-    let income = 0, tabA = 0, keiA = 0, kebA = 0, tabR = 0, keiR = 0, kebR = 0;
-    for (const r of incomeData) {
-      if (r[0]==='Total') income = r[col]||0;
-      if (r[0]==='Tabungan'&&r[1]==0.3) tabA = r[col]||0;
-      if (r[0]==='Keinginan'&&r[1]==0.2) keiA = r[col]||0;
-      if (r[0]==='Kebutuhan'&&r[1]==0.5) kebA = r[col]||0;
-    }
-    for (const r of usageData) {
-      if (r[0]==='Tabungan') tabR = r[col]||0;
-      if (r[0]==='Keinginan') keiR = r[col]||0;
-      if (r[0]==='Kebutuhan') kebR = r[col]||0;
-    }
-    const totalReal = tabR+keiR+kebR;
-    return { bulan, income, tabAlokasi:tabA, keiAlokasi:keiA, kebAlokasi:kebA, realisasi:totalReal, saldo:income-totalReal };
-  });
-}
-
-function addIncome(data) {
-  const sheet = getSheet('Form Responses 1');
-  const now = new Date();
-  const row = [now, 'Pemasukan', data.alokasi, data.transaksi, data.nilai, data.uraian, '', data.transaksi2||'', data.nilai2||'', data.uraian2||''];
-  sheet.appendRow(row);
-  return { success: true };
-}
-
-function addExpense(data) {
-  const sheet = getSheet('Expenses');
-  const tanggal = data.tanggal ? new Date(data.tanggal) : new Date();
-  const row = [tanggal, data.bulan, data.transaksi, data.uraian, data.kategori, data.nilai];
-  sheet.appendRow(row);
-  return { success: true };
-}</pre>
-        </details>
       </div>
     </div>
 
@@ -916,10 +793,24 @@ function changePassword() {
 function initApp() {
   GSHEET_URL = localStorage.getItem('fauzan_gsheet_url') || '';
   SHEET_ID_VAL = localStorage.getItem('fauzan_sheet_id') || '';
+  
+  // Load connection settings
   if (document.getElementById('setting-gsheet-url')) {
     document.getElementById('setting-gsheet-url').value = GSHEET_URL;
     document.getElementById('setting-sheet-id').value = SHEET_ID_VAL;
   }
+  
+  // Load percentage allocations
+  const pctTabungan = localStorage.getItem('fauzan_pct_tabungan') || '30';
+  const pctKeinginan = localStorage.getItem('fauzan_pct_keinginan') || '20';
+  const pctKebutuhan = localStorage.getItem('fauzan_pct_kebutuhan') || '50';
+  
+  if (document.getElementById('setting-pct-tabungan')) {
+    document.getElementById('setting-pct-tabungan').value = pctTabungan;
+    document.getElementById('setting-pct-keinginan').value = pctKeinginan;
+    document.getElementById('setting-pct-kebutuhan').value = pctKebutuhan;
+  }
+
   // Dark mode
   if (localStorage.getItem('fauzan_dark') === '1') {
     document.body.classList.add('dark-mode');
@@ -963,7 +854,7 @@ function closeSidebar() {
 }
 
 // =============================================
-// API CALLS
+// API CALLS (Bypasses CORS OPTIONS with text/plain & carries custom percentages)
 // =============================================
 async function callAPI(params) {
   if (!GSHEET_URL) {
@@ -971,7 +862,18 @@ async function callAPI(params) {
     return null;
   }
   try {
-    const url = GSHEET_URL + '?' + new URLSearchParams(params).toString();
+    const pctTabungan = localStorage.getItem('fauzan_pct_tabungan') || '30';
+    const pctKeinginan = localStorage.getItem('fauzan_pct_keinginan') || '20';
+    const pctKebutuhan = localStorage.getItem('fauzan_pct_kebutuhan') || '50';
+
+    const fullParams = {
+      ...params,
+      pctTabungan,
+      pctKeinginan,
+      pctKebutuhan
+    };
+
+    const url = GSHEET_URL + '?' + new URLSearchParams(fullParams).toString();
     const res = await fetch(url);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return await res.json();
@@ -984,10 +886,21 @@ async function callAPI(params) {
 async function callAPIPost(data) {
   if (!GSHEET_URL) { showToast('URL Google Sheets belum dikonfigurasi', 'error'); return null; }
   try {
+    const pctTabungan = localStorage.getItem('fauzan_pct_tabungan') || '30';
+    const pctKeinginan = localStorage.getItem('fauzan_pct_keinginan') || '20';
+    const pctKebutuhan = localStorage.getItem('fauzan_pct_kebutuhan') || '50';
+
+    const fullData = {
+      ...data,
+      pctTabungan,
+      pctKeinginan,
+      pctKebutuhan
+    };
+
     const res = await fetch(GSHEET_URL, {
       method: 'POST',
-      body: JSON.stringify(data),
-      headers: { 'Content-Type': 'text/plain' }
+      body: JSON.stringify(fullData),
+      headers: { 'Content-Type': 'text/plain' } // Bypasses CORS Preflight OPTIONS
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return await res.json();
@@ -1020,15 +933,30 @@ async function loadDashboard() {
 }
 
 function loadDashboardDemo() {
+  const pctTab = Number(localStorage.getItem('fauzan_pct_tabungan') || '30');
+  const pctKei = Number(localStorage.getItem('fauzan_pct_keinginan') || '20');
+  const pctKeb = Number(localStorage.getItem('fauzan_pct_kebutuhan') || '50');
+
+  const totalIncome = 1000000;
   renderDashboard({
-    income: 916995, realisasi: 30000, alokasi: 916995, saldo: 886995,
-    tabungan: { alokasi: 275098, realisasi: 0, sisa: 275098 },
-    keinginan: { alokasi: 183399, realisasi: 0, sisa: 183399 },
-    kebutuhan: { alokasi: 458498, realisasi: 30000, sisa: 428498 }
+    income: totalIncome, realisasi: 30000, alokasi: totalIncome, saldo: totalIncome - 30000,
+    tabungan: { alokasi: totalIncome * (pctTab / 100), realisasi: 0, sisa: totalIncome * (pctTab / 100) },
+    keinginan: { alokasi: totalIncome * (pctKei / 100), realisasi: 0, sisa: totalIncome * (pctKei / 100) },
+    kebutuhan: { alokasi: totalIncome * (pctKeb / 100), realisasi: 30000, sisa: (totalIncome * (pctKeb / 100)) - 30000 }
   });
 }
 
 function renderDashboard(d) {
+  const pctTabungan = localStorage.getItem('fauzan_pct_tabungan') || '30';
+  const pctKeinginan = localStorage.getItem('fauzan_pct_keinginan') || '20';
+  const pctKebutuhan = localStorage.getItem('fauzan_pct_kebutuhan') || '50';
+
+  // Dynamic labels based on settings!
+  document.getElementById('dash-pct-label').textContent = `Tabungan ${pctTabungan}% · Keinginan ${pctKeinginan}% · Kebutuhan ${pctKebutuhan}%`;
+  document.getElementById('a-tabungan-title').textContent = `💰 Tabungan (${pctTabungan}%)`;
+  document.getElementById('a-keinginan-title').textContent = `🎯 Keinginan (${pctKeinginan}%)`;
+  document.getElementById('a-kebutuhan-title').textContent = `🏠 Kebutuhan (${pctKebutuhan}%)`;
+
   document.getElementById('s-income').textContent = rp(d.income);
   document.getElementById('s-realisasi').textContent = rp(d.realisasi);
   document.getElementById('s-alokasi').textContent = rp(d.alokasi);
@@ -1297,7 +1225,31 @@ function saveSettings() {
   SHEET_ID_VAL = id;
   localStorage.setItem('fauzan_gsheet_url', url);
   localStorage.setItem('fauzan_sheet_id', id);
-  showToast('Pengaturan tersimpan ✓', 'success');
+  showToast('Pengaturan koneksi tersimpan ✓', 'success');
+  loadDashboard();
+}
+
+function saveAllocationSettings() {
+  const tab = document.getElementById('setting-pct-tabungan').value.trim();
+  const kei = document.getElementById('setting-pct-keinginan').value.trim();
+  const keb = document.getElementById('setting-pct-kebutuhan').value.trim();
+
+  if (!tab || !kei || !keb) {
+    showToast('Lengkapi semua alokasi', 'error'); return;
+  }
+
+  const sum = Number(tab) + Number(kei) + Number(keb);
+  if (sum !== 100) {
+    showToast('Gagal: Total alokasi harus berjumlah 100% (sekarang: ' + sum + '%)', 'error');
+    return;
+  }
+
+  localStorage.setItem('fauzan_pct_tabungan', tab);
+  localStorage.setItem('fauzan_pct_keinginan', kei);
+  localStorage.setItem('fauzan_pct_kebutuhan', keb);
+  
+  showToast('Proporsi alokasi berhasil disimpan ✓', 'success');
+  loadDashboard();
 }
 
 async function testConnection() {
