@@ -769,6 +769,17 @@ let ALLOC_PCT = { tabungan: 30, keinginan: 20, kebutuhan: 50 };
 let pendingDeleteFn = null; // deprecated, kept for safety
 
 // =============================================
+// ABORT CONTROLLER — batalkan request lama saat
+// user navigasi sebelum data selesai dimuat
+// =============================================
+const _aborts = {};
+function makeSignal(key) {
+  if (_aborts[key]) { try { _aborts[key].abort(); } catch(_){} }
+  _aborts[key] = new AbortController();
+  return _aborts[key].signal;
+}
+
+// =============================================
 // AUTH — GOOGLE LOGIN / LOGOUT
 // =============================================
 async function loginWithGoogle() {
@@ -896,9 +907,12 @@ function showPage(id) {
     if (n.getAttribute('onclick')?.includes("'" + id + "'")) n.classList.add('active');
   });
   closeSidebar();
+  // Batalkan request sebelumnya agar tidak race condition
+  makeSignal(id);
   if (id === 'data-income')   loadDataIncome();
   if (id === 'data-expenses') loadDataExpenses();
   if (id === 'rekap')         loadRekap();
+  if (id === 'dashboard')     loadDashboard();
 }
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open');
@@ -976,14 +990,22 @@ async function loadDashboard() {
   const pctKei = ALLOC_PCT.keinginan / 100;
   const pctKeb = ALLOC_PCT.kebutuhan / 100;
 
-  // Fetch income bulan ini
-  const { data: incRows } = await sb.from('income')
-    .select('alokasi, nilai')
-    .eq('user_id', currentUser.id)
-    .eq('bulan', bulan).eq('tahun', tahun);
+  // FIX: fetch income & expenses PARALEL + pakai sbQuery (timeout protection)
+  const [resInc, resExp] = await Promise.all([
+    sbQuery(() => sb.from('income')
+      .select('alokasi, nilai')
+      .eq('user_id', currentUser.id)
+      .eq('bulan', bulan)
+      .eq('tahun', tahun)),
+    sbQuery(() => sb.from('expenses')
+      .select('kategori, nilai')
+      .eq('user_id', currentUser.id)
+      .eq('bulan', bulan)
+      .eq('tahun', tahun))
+  ]);
 
   let totalIncome=0, tabA=0, keiA=0, kebA=0;
-  (incRows||[]).forEach(r => {
+  (resInc.data||[]).forEach(r => {
     const v = Number(r.nilai)||0;
     totalIncome += v;
     if (r.alokasi==='Auto'||r.alokasi==='Auto (Gaji/Rutin)') { tabA+=v*pctTab; keiA+=v*pctKei; kebA+=v*pctKeb; }
@@ -992,14 +1014,8 @@ async function loadDashboard() {
     else if (r.alokasi==='Kebutuhan') kebA += v;
   });
 
-  // Fetch expenses bulan ini
-  const { data: expRows } = await sb.from('expenses')
-    .select('kategori, nilai')
-    .eq('user_id', currentUser.id)
-    .eq('bulan', bulan).eq('tahun', tahun);
-
   let tabR=0, keiR=0, kebR=0;
-  (expRows||[]).forEach(r => {
+  (resExp.data||[]).forEach(r => {
     const v = Number(r.nilai)||0;
     if (r.kategori==='Tabungan')  tabR += v;
     else if (r.kategori==='Keinginan') keiR += v;
@@ -1140,11 +1156,11 @@ function resetFormPengeluaran() {
 async function loadDataIncome() {
   const tbody = document.getElementById('income-body');
   tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">Memuat data...</td></tr>';
-  const { data, error } = await sb.from('income')
+  const { data, error } = await sbQuery(() => sb.from('income')
     .select('id,tanggal,bulan,alokasi,transaksi,nilai,uraian')
     .eq('user_id', currentUser.id)
-    .order('tanggal', { ascending: false });
-  if (error) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">Gagal memuat data.</td></tr>'; return; }
+    .order('tanggal', { ascending: false }));
+  if (error) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">Gagal memuat data. Coba refresh.</td></tr>'; return; }
   allIncomeData = data || [];
   renderIncomeTable(allIncomeData);
 }
@@ -1187,11 +1203,11 @@ function filterIncome() {
 async function loadDataExpenses() {
   const tbody = document.getElementById('expenses-body');
   tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">Memuat data...</td></tr>';
-  const { data, error } = await sb.from('expenses')
+  const { data, error } = await sbQuery(() => sb.from('expenses')
     .select('id,tanggal,bulan,kategori,transaksi,nilai,uraian')
     .eq('user_id', currentUser.id)
-    .order('tanggal', { ascending: false });
-  if (error) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">Gagal memuat data.</td></tr>'; return; }
+    .order('tanggal', { ascending: false }));
+  if (error) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">Gagal memuat data. Coba refresh.</td></tr>'; return; }
   allExpensesData = data || [];
   renderExpensesTable(allExpensesData);
 }
@@ -1283,21 +1299,30 @@ async function loadRekap() {
   const pctKei = ALLOC_PCT.keinginan / 100;
   const pctKeb = ALLOC_PCT.kebutuhan / 100;
 
-  const [{ data: incAll }, { data: expAll }] = await Promise.all([
-    sb.from('income').select('bulan,alokasi,nilai').eq('user_id',currentUser.id).eq('tahun',tahun),
-    sb.from('expenses').select('bulan,kategori,nilai').eq('user_id',currentUser.id).eq('tahun',tahun)
+  // FIX: pakai sbQuery (timeout protection) + paralel
+  const [resInc, resExp] = await Promise.all([
+    sbQuery(() => sb.from('income').select('bulan,alokasi,nilai').eq('user_id',currentUser.id).eq('tahun',tahun)),
+    sbQuery(() => sb.from('expenses').select('bulan,kategori,nilai').eq('user_id',currentUser.id).eq('tahun',tahun))
   ]);
+
+  if (resInc.error || resExp.error) {
+    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">Gagal memuat data. Coba refresh.</td></tr>';
+    return;
+  }
+
+  const incAll = resInc.data || [];
+  const expAll = resExp.data || [];
 
   const rows = BULAN_LIST.map(bulan => {
     let income=0, tabA=0, keiA=0, kebA=0, tabR=0, keiR=0, kebR=0;
-    (incAll||[]).filter(r=>r.bulan===bulan).forEach(r=>{
+    incAll.filter(r=>r.bulan===bulan).forEach(r=>{
       const v=Number(r.nilai)||0; income+=v;
       if (r.alokasi==='Auto'||r.alokasi==='Auto (Gaji/Rutin)') { tabA+=v*pctTab; keiA+=v*pctKei; kebA+=v*pctKeb; }
       else if (r.alokasi==='Tabungan')  tabA+=v;
       else if (r.alokasi==='Keinginan') keiA+=v;
       else if (r.alokasi==='Kebutuhan') kebA+=v;
     });
-    (expAll||[]).filter(r=>r.bulan===bulan).forEach(r=>{
+    expAll.filter(r=>r.bulan===bulan).forEach(r=>{
       const v=Number(r.nilai)||0;
       if (r.kategori==='Tabungan')  tabR+=v;
       else if (r.kategori==='Keinginan') keiR+=v;
@@ -1722,32 +1747,52 @@ function toggleEnvelopeField() {
 // KEEP-ALIVE — cegah Supabase Free Tier tidur
 // =============================================
 function startKeepAlive() {
-  // Ping ringan setiap 4 menit selama user aktif
+  // Ping ringan setiap 3 menit selama user aktif
   setInterval(async () => {
+    if (!currentUser) return;
     try { await sb.from('user_settings').select('id').eq('user_id', currentUser.id).limit(1); }
     catch (_) {}
-  }, 4 * 60 * 1000);
+  }, 3 * 60 * 1000);
+
+  // FIX: saat tab kembali aktif (user balik dari tab lain), reload data
+  // — ini penyebab utama "memuat tidak selesai" setelah lama tidak dipakai
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && currentUser) {
+      const activePage = document.querySelector('.page.active')?.id;
+      if (activePage === 'page-dashboard')     loadDashboard();
+      if (activePage === 'page-data-income')   loadDataIncome();
+      if (activePage === 'page-data-expenses') loadDataExpenses();
+      if (activePage === 'page-rekap')         loadRekap();
+    }
+  });
 }
 
 // Wrapper query dengan auto-retry 1x jika timeout/gagal
+// Timeout dinaikkan ke 12 detik untuk koneksi lambat
 async function sbQuery(queryFn, retries = 1) {
   for (let i = 0; i <= retries; i++) {
     try {
       const result = await Promise.race([
         queryFn(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 12000))
       ]);
-      if (result.error && i < retries) continue;
-      return result;
+      // Kalau ada error Supabase tapi bukan timeout, langsung return (jangan retry)
+      if (result && result.error && result.error.message !== 'timeout') return result;
+      if (result && !result.error) return result;
+      // Timeout atau network error: retry sekali
+      if (i < retries) await new Promise(r => setTimeout(r, 2000));
     } catch (e) {
       if (i === retries) return { data: null, error: e };
-      await new Promise(r => setTimeout(r, 1500)); // tunggu 1.5s sebelum retry
+      await new Promise(r => setTimeout(r, 2000));
     }
   }
+  return { data: null, error: new Error('Gagal setelah retry') };
 }
 
 // =============================================
 // REFRESH ALL — dipanggil setiap ada perubahan data
+// FIX: selalu reload dashboard, reload halaman lain
+// hanya jika sedang aktif DAN tidak sedang loading
 // =============================================
 function refreshAll() {
   loadDashboard();
