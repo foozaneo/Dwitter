@@ -360,10 +360,6 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
           <option value="2028">2028</option><option value="2029">2029</option>
           <option value="2030">2030</option><option value="2031">2031</option>
         </select>
-        <button class="btn btn-primary" onclick="loadDashboard()">
-          <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;"><polyline points="23 4 23 10 17 10" stroke-width="2"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" stroke-width="2"/></svg>
-          Refresh
-        </button>
       </div>
     </div>
 
@@ -492,9 +488,6 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
   <div class="page" id="page-data-income">
     <div class="header-section">
       <div class="header-titles"><h2>📥 Data Pemasukan</h2><p>Semua riwayat pemasukan</p></div>
-      <button class="btn btn-primary" onclick="loadDataIncome()">
-        <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;"><polyline points="23 4 23 10 17 10" stroke-width="2"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" stroke-width="2"/></svg> Refresh
-      </button>
     </div>
     <div class="card">
       <div class="search-wrap"><input type="text" id="search-income" placeholder="🔍 Cari transaksi, uraian, bulan..." oninput="filterIncome()"></div>
@@ -515,9 +508,6 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
   <div class="page" id="page-data-expenses">
     <div class="header-section">
       <div class="header-titles"><h2>📤 Data Pengeluaran</h2><p>Semua riwayat pengeluaran</p></div>
-      <button class="btn btn-primary" onclick="loadDataExpenses()">
-        <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;"><polyline points="23 4 23 10 17 10" stroke-width="2"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" stroke-width="2"/></svg> Refresh
-      </button>
     </div>
     <div class="card">
       <div class="search-wrap"><input type="text" id="search-expenses" placeholder="🔍 Cari transaksi, uraian, kategori..." oninput="filterExpenses()"></div>
@@ -544,9 +534,6 @@ body.dark-mode .alokasi-card,.dark-mode .stat-card,.dark-mode .card{background:v
           <option value="2028">2028</option><option value="2029">2029</option>
           <option value="2030">2030</option><option value="2031">2031</option>
         </select>
-        <button class="btn btn-primary" onclick="loadRekap()">
-          <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;"><polyline points="23 4 23 10 17 10" stroke-width="2"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" stroke-width="2"/></svg> Refresh
-        </button>
       </div>
     </div>
     <div class="card">
@@ -983,7 +970,7 @@ async function submitPemasukan() {
   btn.disabled=false;
   btn.innerHTML='<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;"><polyline points="20 6 9 17 4 12" stroke-width="2"/></svg> Simpan Pemasukan';
 
-  if (!error) { showToast('Pemasukan berhasil disimpan ✓', 'success'); resetFormPemasukan(); }
+  if (!error) { showToast('Pemasukan berhasil disimpan ✓', 'success'); resetFormPemasukan(); refreshAll(); }
   else showToast('Gagal: ' + error.message, 'error');
 }
 
@@ -1018,7 +1005,7 @@ async function submitPengeluaran() {
   btn.disabled=false;
   btn.innerHTML='<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;"><polyline points="20 6 9 17 4 12" stroke-width="2"/></svg> Simpan Pengeluaran';
 
-  if (!error) { showToast('Pengeluaran berhasil disimpan ✓', 'success'); resetFormPengeluaran(); }
+  if (!error) { showToast('Pengeluaran berhasil disimpan ✓', 'success'); resetFormPengeluaran(); refreshAll(); }
   else showToast('Gagal: ' + error.message, 'error');
 }
 
@@ -1145,8 +1132,7 @@ async function doDelete(table, id) {
   const { error } = await sb.from(table).delete().eq('id', id).eq('user_id', currentUser.id);
   if (!error) {
     showToast('Data berhasil dihapus ✓', 'success');
-    if (table === 'income')   loadDataIncome();
-    if (table === 'expenses') loadDataExpenses();
+    refreshAll();
   } else {
     showToast('Gagal menghapus: ' + error.message, 'error');
   }
@@ -1244,6 +1230,17 @@ function showToast(msg, type) {
   t.className = 'toast show' + (type?' '+type:'');
   clearTimeout(t._timer);
   t._timer = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+// =============================================
+// REFRESH ALL — dipanggil setiap ada perubahan data
+// =============================================
+function refreshAll() {
+  loadDashboard();
+  const activePage = document.querySelector('.page.active')?.id;
+  if (activePage === 'page-data-income')   loadDataIncome();
+  if (activePage === 'page-data-expenses') loadDataExpenses();
+  if (activePage === 'page-rekap')         loadRekap();
 }
 
 // =============================================
